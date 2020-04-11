@@ -29,5 +29,5 @@ var Start = {
 
     startGame3: function() {
         game.state.start("Game3");
-    },
+    }
 };
