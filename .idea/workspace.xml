@@ -2,15 +2,18 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c250b96d-e35f-47b7-b1ac-fd1ef7ee8243" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/assets/flag1.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/flag2.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/bag.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/bag2.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/car.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/turnBall.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/turnBar.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/TmpGame1.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/game2.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/ground.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/head.png" beforeDir="false" afterPath="$PROJECT_DIR$/assets/head.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/obstacle.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/player.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/tail.png" beforeDir="false" afterPath="$PROJECT_DIR$/assets/tail.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/11.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/bead-874cc643b18fbe33aacee82d8f4353eec013afca7486232ce8e36adbbae9eeb6.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/controller.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/controller.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/game1.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/game1.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/start.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/start.js" afterDir="false" />
     </list>
@@ -40,7 +43,7 @@
     <property name="DefaultHtmlFileTemplate" value="HTML File" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="last_opened_file_path" value="D:/test/APP-master" />
+    <property name="last_opened_file_path" value="D:/test/infinite-scrolling-demo-master" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="settings.editor.selected.configurable" value="project.propVCSSupport.Mappings" />
   </component>
@@ -84,7 +87,12 @@
       <workItem from="1586226522528" duration="796000" />
       <workItem from="1586451590483" duration="2523000" />
       <workItem from="1586601710356" duration="3060000" />
-      <workItem from="1586610816949" duration="7525000" />
+      <workItem from="1586610816949" duration="9229000" />
+      <workItem from="1586680880249" duration="8022000" />
+      <workItem from="1586707422135" duration="600000" />
+      <workItem from="1586708055569" duration="5652000" />
+      <workItem from="1586745601313" duration="1439000" />
+      <workItem from="1586788601053" duration="6950000" />
     </task>
     <servers />
   </component>
