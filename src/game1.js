@@ -91,7 +91,7 @@ var Game1={
         }
     },
 
-    moveTail: function (i,x,y,stage1,tail,head,valueHead,valueTail,checkMatch,matchHead,state) {
+    moveTail: function (i,x,y,stage1,tail,head,valueHead,valueTail,checkMatch,matchHead,operator,state) {
         var style={ font: "72px Arial", fill: "#000"};
 
         if(game.input.mousePointer.isDown ) {
@@ -107,7 +107,7 @@ var Game1={
                         game.physics.arcade.moveToXY(tail[i], head[0].x - tail[0].width, head[0].y, 100, 100);
                         matchHead[0]=i;
                         if((valueTail[i]+valueHead[0])%10 === 0) {
-                            Game1.addOperator(head[0],style);
+                            if(!checkMatch[0]) Game1.addOperator(head[0],operator,style);
                             tail[i].input.disableDrag();
                             checkMatch[0]=true;
                         }
@@ -120,7 +120,7 @@ var Game1={
                             game.physics.arcade.moveToXY(tail[i], head[0].x - tail[0].width, head[1].y, 100, 100);
                             matchHead[1]=i;
                             if ((valueTail[i]+valueHead[1])%10===0) {
-                                Game1.addOperator(head[1],style);
+                                if(!checkMatch[1]) Game1.addOperator(head[1],operator,style);
                                 tail[i].input.disableDrag();
                                 checkMatch[1]=true;
                             }
@@ -132,7 +132,7 @@ var Game1={
                             game.physics.arcade.moveToXY(tail[i], head[0].x - tail[0].width, head[2].y, 100, 100);
                             matchHead[2]=i;
                             if ((valueTail[i]+valueHead[2])%10===0) {
-                                Game1.addOperator(head[2],style);
+                                if(!checkMatch[2]) Game1.addOperator(head[2],operator,style);
                                 tail[i].input.disableDrag();
                                 checkMatch[2]=true;
                             }
@@ -146,9 +146,12 @@ var Game1={
         }
     },
 
-    addOperator: function (head,style) {
-        plus = game.add.text(head.x-32,head.y+53,'+',style);
-        newText.anchor.set(0.5);
+    addOperator: function (head,operator,style) {
+        newOperator = game.add.text(head.x-10,head.y+90,'+',style);
+        newOperator.anchor.set(0.5);
+        game.physics.arcade.enable(newOperator);
+        newOperator.inputEnabled = true;
+        operator.push(newOperator);
     },
 
     inputRes:function(i,state){
@@ -216,13 +219,12 @@ Game1.StateA.prototype = {
         matchHead=[-1,-1,-1];
 
         res=['','',''];
-        operator=['','',''];
-
+        operator=[];
     },
 
     update: function  () {
         for(i=0;i<3;i++){
-                Game1.moveTail(i,this.stage1.x + 100, this.head[i].y,this.stage1,this.tail,this.head,valueHead,valueTail,checkMatch,matchHead,this);
+                Game1.moveTail(i,this.stage1.x + 100, this.head[i].y,this.stage1,this.tail,this.head,valueHead,valueTail,checkMatch,matchHead,operator,this);
         }
 
         for(i=0;i<3;i++){
@@ -243,6 +245,10 @@ Game1.StateA.prototype = {
         for(i=0;i<3;i++) {
             if(checkMatch[i] && !checkRes[i]) {
                 Game1.inputRes(i,this);
+            }
+            if(checkMatch[i] && checkRes[i]){
+                this.tail[matchHead[i]].body.velocity.x=500;
+                this.head[i].body.velocity.x=500;
             }
         }
 
@@ -376,6 +382,5 @@ Game1.StateB.prototype = {
         }
 
     }
-
 
 };
