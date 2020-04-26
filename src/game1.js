@@ -8,26 +8,178 @@ var Game1={
         game.load.image("flag","assets/flag1.png");
         game.load.image("turnBall","assets/turnBall.png");
         game.load.image("turnBar","assets/turnBar.png");
+    },
+
+    back: function () {
+        game.state.start("Start");
+    },
+
+    addBackButton: function (stage1) {
+        backButton = game.add.text(stage1.x + 5, stage1.y+7, "<", { font: "40px Arial", fill: " #00BFFF", align: "center" });
+        backButton2 = game.add.text(stage1.x + 30, stage1.y+14, "Back", { font: "25px Arial", fill: " #00BFFF", align: "center" });
+        backButton.inputEnabled = true;
+        backButton2.inputEnabled = true;
+        backButton.events.onInputUp.add(Game1.back);
+        backButton2.events.onInputUp.add(Game1.back);
+    },
+
+    addTurnBar: function(turn,ball){
+
+        turnBar = game.add.image(game.world.width/2,50,"turnBar");
+        turnBar.anchor.set(0.5);
+
+        for(i=0; i<turn; i++){
+            newBall = game.add.sprite(turnBar.x - turnBar.width/2 + 15 + i*23,turnBar.y,"turnBall");
+            newBall.anchor.set(0.5);
+            game.physics.arcade.enable(newBall);
+            ball.push(newBall);
+        }
+        for(i=0; i<3-turn; i++){
+            newBall = game.add.sprite(turnBar.x + turnBar.width/2 - 15 - i*23,turnBar.y,"turnBall");
+            newBall.anchor.set(0.5);
+            game.physics.arcade.enable(newBall);
+            ball.push(newBall);
+        }
+    },
+
+    addTail: function (stage1,tail) {
+        for(i=0;i<3;i++){
+            if(i>0) {
+                newTail = game.add.sprite(stage1.x + 100, stage1.y + 75 + i*(25+tail[i-1].height), "tail");
+            }
+            else{
+                newTail = game.add.sprite(stage1.x + 100, stage1.y + 75, "tail");
+            }
+            game.physics.arcade.enable(newTail);
+            newTail.inputEnabled = true;
+            newTail.input.enableDrag();
+            newTail.input.boundsRect = bounds;
+            newTail.outOfBoundsKill = true;
+            tail.push(newTail);
+        }
+    },
+
+    addHead: function (stage1,head,tail) {
+        for(i=0;i<3;i++){
+            newHead = game.add.sprite(stage1.x + stage1.width - 266 - 75, tail[i].y, "head" );
+            game.physics.arcade.enable(newHead);
+            newHead.inputEnabled = true;
+            head.push(newHead);
+        }
+    },
+
+    addFlag: function (flag,head) {
+        for(i=0;i<3;i++){
+            newFlag = game.add.image(head[i].x+200,head[i].y-6,"flag");
+            flag.push(newFlag);
+        }
+    },
+
+    addTextHead: function(textHead,valueHead,style){
+        for(i=0;i<3;i++){
+            newText = game.add.text(100, 100, valueHead[i], style);
+            newText.anchor.set(0.5);
+            textHead.push(newText);
+        }
+    },
+
+    addTextTail: function(textTail,valueTail,style){
+        for(i=0;i<3;i++){
+            newText = game.add.text(100, 100, valueTail[i], style);
+            newText.anchor.set(0.5);
+            textTail.push(newText);
+        }
+    },
+
+    moveTail: function (i,x,y,stage1,tail,head,valueHead,valueTail,checkMatch,matchHead,state) {
+        var style={ font: "72px Arial", fill: "#000"};
+
+        if(game.input.mousePointer.isDown ) {
+            tail[i].body.velocity.setTo(0, 0);
+        }
+        else {
+            if(tail[i].x !== x || tail[i].y !== y) {
+                if (tail[i].x < stage1.x + stage1.height/2) {
+                    game.physics.arcade.moveToXY(tail[i], x, y, 100, 100);
+                }
+                else {
+                    if (tail[i].y < head[1].y-head[0].height/2){
+                        game.physics.arcade.moveToXY(tail[i], head[0].x - tail[0].width, head[0].y, 100, 100);
+                        matchHead[0]=i;
+                        if((valueTail[i]+valueHead[0])%10 === 0) {
+                            Game1.addOperator(head[0],style);
+                            tail[i].input.disableDrag();
+                            checkMatch[0]=true;
+                        }
+                        else{
+                            game.time.events.add(1500, state.backIfFail, state);
+                        }
+                    }
+                    else {
+                        if (tail[i].y < head[2].y-head[1].height/2) {
+                            game.physics.arcade.moveToXY(tail[i], head[0].x - tail[0].width, head[1].y, 100, 100);
+                            matchHead[1]=i;
+                            if ((valueTail[i]+valueHead[1])%10===0) {
+                                Game1.addOperator(head[1],style);
+                                tail[i].input.disableDrag();
+                                checkMatch[1]=true;
+                            }
+                            else {
+                                game.time.events.add(1500, state.backIfFail, state);
+                            }
+                        }
+                        else {
+                            game.physics.arcade.moveToXY(tail[i], head[0].x - tail[0].width, head[2].y, 100, 100);
+                            matchHead[2]=i;
+                            if ((valueTail[i]+valueHead[2])%10===0) {
+                                Game1.addOperator(head[2],style);
+                                tail[i].input.disableDrag();
+                                checkMatch[2]=true;
+                            }
+                            else {
+                                game.time.events.add(1500, state.backIfFail, state);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+
+    addOperator: function (head,style) {
+        plus = game.add.text(head.x-32,head.y+53,'+',style);
+        newText.anchor.set(0.5);
+    },
+
+    inputRes:function(i,state){
+        if(i===0) {
+            game.input.keyboard.addCallbacks(state, null, null, state.isTrueKey1);
+        }
+        else if(i===1){
+            game.input.keyboard.addCallbacks(state, null, null, state.isTrueKey2);
+        }
+        else {
+            game.input.keyboard.addCallbacks(state, null, null, state.isTrueKey3);
+        }
     }
 
 };
 
 Game1.StateA = function () {
-    this.tail1;
-    this.tail2;
-    this.tail3;
-    this.head1;
-    this.head2;
-    this.head3;
     this.stage1;
     this.ball;
     this.turn = 3;
+    this.tail;
+    this.head;
+    this.flag;
+    this.text;
     this.next1=false;
     this.next2=false;
     this.next3=false;
 };
 
 Game1.StateA.prototype = {
+
     preload: function () {
         Game1.preload();
     },
@@ -35,164 +187,134 @@ Game1.StateA.prototype = {
     create: function() {
 
         game.physics.startSystem(Phaser.Physics.ARCADE);
-
-        var style = { font: "32px Arial", fill: "#000"};
-
         this.add.image(0, 0, "background");
         this.stage1 = game.add.sprite(game.world.width/2 - 475,25, "stage1" );
-
-        turnBar = game.add.image(game.world.width/2,50,"turnBar");
-        turnBar.anchor.set(0.5);
-
-        this.ball = [];
-        for(i=0; i<this.turn; i++){
-            newBall = this.add.sprite(turnBar.x - turnBar.width/2 + 15 + i*23,turnBar.y,"turnBall");
-            newBall.anchor.set(0.5);
-            game.physics.arcade.enable(newBall);
-            this.ball.push(newBall);
-        }
-        for(i=0; i<3-this.turn; i++){
-            newBall = this.add.sprite(turnBar.x + turnBar.width/2 - 15 - i*23,turnBar.y,"turnBall");
-            newBall.anchor.set(0.5);
-            game.physics.arcade.enable(newBall);
-            this.ball.push(newBall);
-        }
-
-        backButton = this.add.text(this.stage1.x + 5, this.stage1.y+7, "<", { font: "40px Arial", fill: " #00BFFF", align: "center" });
-        backButton2 = this.add.text(this.stage1.x + 30, this.stage1.y+14, "Back", { font: "25px Arial", fill: " #00BFFF", align: "center" });
-        backButton.inputEnabled = true;
-        backButton2.inputEnabled = true;
-        backButton.events.onInputUp.add(this.back, this);
-        backButton2.events.onInputUp.add(this.back, this);
-
         bounds = new Phaser.Rectangle(game.world.width/2 - 473, 78, 608, 580);
 
-        this.tail1 = game.add.sprite(this.stage1.x + 100, this.stage1.y + 75, "tail");
-        game.physics.arcade.enable(this.tail1);
-        this.tail1.inputEnabled = true;
-        this.tail1.input.enableDrag();
-        this.tail1.input.boundsRect = bounds;
+        Game1.addBackButton(this.stage1);
+        this.ball = [];
+        Game1.addTurnBar(this.turn,this.ball);
 
-        textTail1 = game.add.text(100, 100, 27, style);
-        textTail1.anchor.set(0.5);
+        this.tail=[];
+        Game1.addTail(this.stage1,this.tail);
+        this.head=[];
+        Game1.addHead(this.stage1,this.head,this.tail);
+        this.flag=[];
+        Game1.addFlag(this.flag,this.head);
 
-        this.tail2 = game.add.sprite(this.stage1.x + 100, this.stage1.y + this.tail1.height + 100, "tail");
-        game.physics.arcade.enable(this.tail2);
-        this.tail2.inputEnabled = true;
-        this.tail2.input.enableDrag();
-        this.tail2.input.boundsRect = bounds;
+        var style = { font: "32px Arial", fill: "#000"};
+        valueHead=[42,13,34];
+        valueTail=[27,36,8];
+        textHead=[];
+        textTail=[];
+        Game1.addTextHead(textHead,valueHead,style);
+        Game1.addTextTail(textTail,valueTail,style);
 
-        textTail2 = game.add.text(100, 100, 36, style);
-        textTail2.anchor.set(0.5);
+        checkMatch=[false,false,false];
+        checkRes=[false,false,false];
+        checkMoveCar=[false,false,false];
+        matchHead=[-1,-1,-1];
 
-        this.tail3 = game.add.sprite(this.stage1.x + 100, this.stage1.y + 2*this.tail1.height + 125, "tail");
-        game.physics.arcade.enable(this.tail3);
-        this.tail3.inputEnabled = true;
-        this.tail3.input.enableDrag();
-        this.tail3.input.boundsRect = bounds;
+        res=['','',''];
+        operator=['','',''];
 
-        textTail3 = game.add.text(100, 100, 8, style);
-        textTail3.anchor.set(0.5);
-
-        this.head1 = game.add.sprite(this.stage1.x + this.stage1.width - 266 - 75, this.stage1.y + 75, "head" );
-        this.head2 = game.add.sprite(this.stage1.x + this.stage1.width - 266 - 75, this.stage1.y + this.tail1.height + 100, "head" );
-        this.head3 = game.add.sprite(this.stage1.x + this.stage1.width - 266 - 75, this.stage1.y + 2*this.tail1.height + 125, "head" );
-
-        var flag1 = game.add.image(this.head1.x+200,this.head1.y-6,"flag");
-        var flag2 = game.add.image(this.head2.x+200,this.head2.y-6,"flag");
-        var flag3 = game.add.image(this.head3.x+200,this.head3.y-6,"flag");
-
-
-        textHead1 = game.add.text(100, 100, 42, style);
-        textHead1.anchor.set(0.5);
-
-        textHead2 = game.add.text(100, 100, 13, style);
-        textHead2.anchor.set(0.5);
-
-        textHead3 = game.add.text(100, 100, 34, style);
-        textHead3.anchor.set(0.5);
-
-    },
-
-    gotoStateB: function () {
-        this.state.start('StateB');
-    },
-
-    back: function () {
-        game.state.start("Start");
     },
 
     update: function  () {
+        for(i=0;i<3;i++){
+                Game1.moveTail(i,this.stage1.x + 100, this.head[i].y,this.stage1,this.tail,this.head,valueHead,valueTail,checkMatch,matchHead,this);
+        }
 
-        this.moveTail(this.tail1,this.stage1.x + 100, this.head1.y);
-        this.moveTail(this.tail2,this.stage1.x + 100, this.head2.y);
-        this.moveTail(this.tail3,this.stage1.x + 100, this.head3.y);
+        for(i=0;i<3;i++){
+            textHead[i].x = Math.floor(this.head[i].x + this.head[i].width / 2 - 47);
+            textHead[i].y = Math.floor(this.head[i].y + this.head[i].height / 2 + 8 );
+        }
 
-        textTail1.x = Math.floor(this.tail1.x + this.tail1.width / 2 + 1);
-        textTail1.y = Math.floor(this.tail1.y + this.tail1.height / 2 + 8);
+        for(i=0;i<3;i++){
+            textTail[i].x = Math.floor(this.tail[i].x + this.tail[i].width / 2 + 1);
+            textTail[i].y = Math.floor(this.tail[i].y + this.tail[i].height / 2 + 8 );
+        }
 
-        textTail2.x = Math.floor(this.tail2.x + this.tail1.width / 2 + 1);
-        textTail2.y = Math.floor(this.tail2.y + this.tail1.height / 2 + 8);
+        for(i=0;i<3;i++){
+            this.flag[i].x = Math.floor(this.head[i].x+200);
+            this.flag[i].y = Math.floor(this.head[i].y-6);
+        }
 
-        textTail3.x = Math.floor(this.tail3.x + this.tail1.width / 2 + 1);
-        textTail3.y = Math.floor(this.tail3.y + this.tail1.height / 2 + 8);
+        for(i=0;i<3;i++) {
+            if(checkMatch[i] && !checkRes[i]) {
+                Game1.inputRes(i,this);
+            }
+        }
 
-        textHead1.x = Math.floor(this.head1.x + this.head1.width / 2 - 47);
-        textHead1.y = Math.floor(this.head1.y + this.head1.height / 2 + 8 );
-
-        textHead2.x = Math.floor(this.head2.x + this.head1.width / 2 - 47);
-        textHead2.y = Math.floor(this.head2.y + this.head1.height / 2 + 8 );
-
-        textHead3.x = Math.floor(this.head3.x + this.head1.width / 2 - 47);
-        textHead3.y = Math.floor(this.head3.y + this.head1.height / 2 + 8 );
-
-        if(this.next1 && this.next2 && this.next3) {
+        if(checkMoveCar[0] && checkMoveCar[1] && checkMoveCar[2]) {
             game.physics.arcade.moveToXY(this.ball[2], turnBar.x + turnBar.width/2 - 15, turnBar.y, 100, 300);
             a=this.game.time.events.add(2000, this.gotoStateB, this);
         }
     },
 
-    moveTail: function (a,x,y) {
-        if(game.input.mousePointer.isDown ) {
-            a.body.velocity.setTo(0, 0);
-        }
-        else {
-            if(a.x !== x || a.y !== y) {
-                if (a.x < this.stage1.x + 325) {
-                    game.physics.arcade.moveToXY(a, x, y, 100, 100);
-                }
-                else {
-                    if (a.y < this.head2.y-this.head1.height/2){
-                        game.physics.arcade.moveToXY(a, this.head1.x - this.tail1.width, this.head1.y, 100, 100);
-                        if(a===this.tail3)this.next3=true;
-                    }
-                    else {
-                        if (a.y < this.head3.y-this.head2.height/2) {
-                            game.physics.arcade.moveToXY(a, this.head1.x - this.tail1.width, this.head2.y, 100, 100);
-                            if (a===this.tail1) this.next1=true;
-                        }
-                        else {
-                            game.physics.arcade.moveToXY(a, this.head1.x - this.tail1.width, this.head3.y, 100, 100);
-                            if (a===this.tail2) this.next2=true;
-                        }
-                    }
-                }
+    backIfFail: function(){
+        for(i=0;i<3;i++){
+            if(matchHead[i]>-1 && !checkMatch[i]){
+                game.physics.arcade.moveToXY(this.tail[matchHead[i]], this.stage1.x + 100, this.head[i].y, 100, 100);
+                matchHead[i]=-1;
             }
         }
-    }
+    },
 
+    isTrueKey1: function(char){
+        if (res[0].length < 2) res[0] = res[0] + char;
+        if (res[0].length === 1) a1 = game.add.text(this.flag[0].x+20, this.flag[0].y+20, res[0]);
+        else if (res[0].length === 2) a2 = game.add.text(a1.x+15, a1.y, res[0].charAt(1));
+        trueRes = valueHead[0] + valueTail[matchHead[0]];
+        if (res[0].length === 2 && res[0] !== trueRes.toString()) {
+            a1.destroy();
+            a2.destroy();
+            res[0] = '';
+        }
+        else if (res[0]===trueRes.toString()) checkRes[0]=true;
+    },
+
+    isTrueKey2: function(char){
+        if (res[1].length < 2) res[1] = res[1] + char;
+        if (res[1].length === 1) a1 = game.add.text(this.flag[1].x+20, this.flag[1].y+20, res[1]);
+        else if (res[1].length === 2) a2 = game.add.text(a1.x+15, a1.y, res[1].charAt(1));
+        trueRes = valueHead[1] + valueTail[matchHead[1]];
+        if (res[1].length === 2 && res[1] !== trueRes.toString()) {
+            a1.destroy();
+            a2.destroy();
+            res[1] = '';
+        }
+        else if (res[1]===trueRes.toString()) checkRes[1]=true;
+    },
+
+    isTrueKey3: function(char){
+        if (res[2].length < 2) res[2] = res[2] + char;
+        if (res[2].length === 1) a1 = game.add.text(this.flag[2].x+20, this.flag[2].y+20, res[2]);
+        else if (res[2].length === 2) a2 = game.add.text(a1.x+15, a1.y, res[2].charAt(1));
+        trueRes = valueHead[2] + valueTail[matchHead[2]];
+        if (res[2].length === 2 && res[2] !== trueRes.toString()) {
+            a1.destroy();
+            a2.destroy();
+            res[2] = '';
+        }
+        else if (res[2]===trueRes.toString()) checkRes[2]=true;
+    },
+
+    gotoStateB: function () {
+        game.state.start('Game1_StateB');
+    }
 };
 
 Game1.StateB = function () {
-    this.tail1;
-    this.tail2;
-    this.tail3;
-    this.head1;
-    this.head2;
-    this.head3;
     this.stage1;
     this.ball;
     this.turn = 2;
+    this.tail;
+    this.head;
+    this.flag;
+    this.next1=false;
+    this.next2=false;
+    this.next3=false;
 };
 
 Game1.StateB.prototype = {
@@ -200,141 +322,60 @@ Game1.StateB.prototype = {
     preload: function () {
         Game1.preload();
     },
+
     create: function() {
 
         game.physics.startSystem(Phaser.Physics.ARCADE);
 
         this.add.image(0, 0, "background");
-
         this.stage1 = game.add.sprite(game.world.width/2 - 475,25, "stage1" );
-        game.physics.arcade.enable(this.stage1);
-
-        turnBar = game.add.image(game.world.width/2,50,"turnBar");
-        turnBar.anchor.set(0.5);
-
-        this.ball = [];
-        for(i=0; i<this.turn; i++){
-            newBall = this.add.sprite(turnBar.x - turnBar.width/2 + 15 + i*23,turnBar.y,"turnBall");
-            newBall.anchor.set(0.5);
-            game.physics.arcade.enable(newBall);
-            this.ball.push(newBall);
-        }
-        for(i=0; i<3-this.turn; i++){
-            newBall = this.add.sprite(turnBar.x + turnBar.width/2 - 15 - i*23,turnBar.y,"turnBall");
-            newBall.anchor.set(0.5);
-            game.physics.arcade.enable(newBall);
-            this.ball.push(newBall);
-        }
-
         bounds = new Phaser.Rectangle(game.world.width/2 - 473, 78, 608, 580);
 
-        this.tail1 = game.add.sprite(this.stage1.x + 100, this.stage1.y + 75, "tail");
-        game.physics.arcade.enable(this.tail1);
-        this.tail1.inputEnabled = true;
-        this.tail1.input.enableDrag(false,false);
-        this.tail1.input.boundsRect = bounds;
+        Game1.addBackButton(this.stage1);
+        this.ball = [];
+        Game1.addTurnBar(this.turn,this.ball);
 
-        this.tail2 = game.add.sprite(this.stage1.x + 100, this.stage1.y + this.tail1.height + 100, "tail");
-        game.physics.arcade.enable(this.tail2);
-        this.tail2.inputEnabled = true;
-        this.tail2.input.enableDrag(false,false);
-        this.tail2.input.boundsRect = bounds;
-
-        this.tail3 = game.add.sprite(this.stage1.x + 100, this.stage1.y + 2*this.tail1.height + 125, "tail");
-        game.physics.arcade.enable(this.tail3);
-        this.tail3.inputEnabled = true;
-        this.tail3.input.enableDrag(false,false);
-        this.tail3.input.boundsRect = bounds;
-
-        this.head1 = game.add.sprite(this.stage1.x + this.stage1.width - 266 - 75, this.stage1.y + 75, "head" );
-        game.physics.arcade.enable(this.head1);
-        this.head1.body.immovable = true;
-
-        this.head2 = game.add.sprite(this.stage1.x + this.stage1.width - 266 - 75, this.stage1.y + this.tail1.height + 100, "head" );
-        game.physics.arcade.enable(this.head2);
-        this.head2.body.immovable = true;
-
-        this.head3 = game.add.sprite(this.stage1.x + this.stage1.width - 266 - 75, this.stage1.y + 2*this.tail1.height + 125, "head" );
-        game.physics.arcade.enable(this.head3);
-        this.head3.body.immovable = true;
-
-        var flag1 = game.add.image(this.head1.x+201,this.head1.y-6,"flag");
-        var flag2 = game.add.image(this.head2.x+201,this.head2.y-6,"flag");
-        var flag3 = game.add.image(this.head3.x+201,this.head3.y-6,"flag");
+        this.tail=[];
+        Game1.addTail(this.stage1,this.tail);
+        this.head=[];
+        Game1.addHead(this.stage1,this.head,this.tail);
+        this.flag=[];
+        Game1.addFlag(this.flag,this.head);
 
         var style = { font: "32px Arial", fill: "#000"};
-        textTail1 = game.add.text(100, 100, 100, style);
-        textTail1.anchor.set(0.5);
+        valueHead=[42,13,34];
+        valueTail=[27,36,8];
+        textHead=[];
+        textTail=[];
+        Game1.addTextHead(textHead,valueHead,style);
+        Game1.addTextTail(textTail,valueTail,style);
 
-        textTail2 = game.add.text(100, 100, 100, style);
-        textTail2.anchor.set(0.5);
-
-        textTail3 = game.add.text(100, 100, 8, style);
-        textTail3.anchor.set(0.5);
-
-        textHead1 = game.add.text(100, 100, 42, style);
-        textHead1.anchor.set(0.5);
-
-        textHead2 = game.add.text(100, 100, 13, style);
-        textHead2.anchor.set(0.5);
-
-        textHead3 = game.add.text(100, 100, 34, style);
-        textHead3.anchor.set(0.5);
-    },
-
-    gotoStateC: function () {
-
-        this.state.start('StateC');
-
+        checkMatch=[false,false,false];
+        checkAdd=[false,false,false];
     },
 
     update: function  () {
 
-        this.moveTail(this.tail1,this.stage1.x + 100, this.head1.y);
-        this.moveTail(this.tail2,this.stage1.x + 100, this.head2.y);
-        this.moveTail(this.tail3,this.stage1.x + 100, this.head3.y);
-
-        textTail1.x = Math.floor(this.tail1.x + this.tail1.width / 2 + 1);
-        textTail1.y = Math.floor(this.tail1.y + this.tail1.height / 2 + 8);
-
-        textTail2.x = Math.floor(this.tail2.x + this.tail1.width / 2 + 1);
-        textTail2.y = Math.floor(this.tail2.y + this.tail1.height / 2 + 8);
-
-        textTail3.x = Math.floor(this.tail3.x + this.tail1.width / 2 + 1);
-        textTail3.y = Math.floor(this.tail3.y + this.tail1.height / 2 + 8);
-
-        textHead1.x = Math.floor(this.head1.x + this.head1.width / 2 - 47);
-        textHead1.y = Math.floor(this.head1.y + this.head1.height / 2 + 8 );
-
-        textHead2.x = Math.floor(this.head2.x + this.head1.width / 2 - 47);
-        textHead2.y = Math.floor(this.head2.y + this.head1.height / 2 + 8 );
-
-        textHead3.x = Math.floor(this.head3.x + this.head1.width / 2 - 47);
-        textHead3.y = Math.floor(this.head3.y + this.head1.height / 2 + 8 );
-    },
-
-
-    moveTail: function (a,x,y) {
-        if(game.input.mousePointer.isDown ) {
-            a.body.velocity.setTo(0, 0);
+        for(i=0;i<3;i++){
+            Game1.moveTail(i,this.stage1.x + 100, this.head[i].y,this.stage1,this.tail,this.head, checkMatch);
         }
-        else {
-            if(a.x !== this.stage1.x + 100) {
-                if (a.x < this.stage1.x + 325) {
-                    game.physics.arcade.moveToXY(a, x, y, 100, 100);
-                }
-                else {
-                    if (a.y < this.head2.y-this.head1.height/2){
-                        game.physics.arcade.moveToXY(a, this.head1.x - this.tail1.width, this.head1.y, 100, 100);
-                    }
-                    else {
-                        if (a.y < this.head3.y-this.head2.height/2) {
-                            game.physics.arcade.moveToXY(a, this.head1.x - this.tail1.width, this.head2.y, 100, 100);
-                        }
-                        else game.physics.arcade.moveToXY(a, this.head1.x - this.tail1.width, this.head3.y, 100, 100);
-                    }
-                }
-            }
+
+        for(i=0;i<3;i++){
+            textHead[i].x = Math.floor(this.head[i].x + this.head[i].width / 2 - 47);
+            textHead[i].y = Math.floor(this.head[i].y + this.head[i].height / 2 + 8 );
         }
+
+        for(i=0;i<3;i++){
+            textTail[i].x = Math.floor(this.tail[i].x + this.tail[i].width / 2+1);
+            textTail[i].y = Math.floor(this.tail[i].y + this.tail[i].height / 2 + 8 );
+        }
+
+        if(checkMoveHead[0] && checkMoveHead[1] && checkMoveHead[2]) {
+            game.physics.arcade.moveToXY(this.ball[2], turnBar.x + turnBar.width/2 - 15, turnBar.y, 100, 300);
+            a=this.game.time.events.add(2000, this.gotoStateC, this);
+        }
+
     }
+
+
 };

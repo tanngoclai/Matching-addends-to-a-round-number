@@ -2,20 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c250b96d-e35f-47b7-b1ac-fd1ef7ee8243" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/assets/bag.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/bag2.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/car.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/turnBall.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/turnBar.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/TmpGame1.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/game2.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/textbox.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/11.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/bead-874cc643b18fbe33aacee82d8f4353eec013afca7486232ce8e36adbbae9eeb6.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/controller.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/controller.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/TmpGame1.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/TmpGame1.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/game1.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/game1.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/start.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/start.js" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -43,7 +33,7 @@
     <property name="DefaultHtmlFileTemplate" value="HTML File" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="last_opened_file_path" value="D:/test/infinite-scrolling-demo-master" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="settings.editor.selected.configurable" value="project.propVCSSupport.Mappings" />
   </component>
@@ -93,6 +83,13 @@
       <workItem from="1586708055569" duration="5652000" />
       <workItem from="1586745601313" duration="1439000" />
       <workItem from="1586788601053" duration="6950000" />
+      <workItem from="1587546729452" duration="1737000" />
+      <workItem from="1587548898446" duration="6353000" />
+      <workItem from="1587721574107" duration="5796000" />
+      <workItem from="1587736253896" duration="8210000" />
+      <workItem from="1587800232445" duration="11374000" />
+      <workItem from="1587890630333" duration="9365000" />
+      <workItem from="1587902243819" duration="992000" />
     </task>
     <servers />
   </component>
