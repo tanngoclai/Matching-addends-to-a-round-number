@@ -19,8 +19,8 @@ var Game3={
         backButton2 = game.add.text(stage1.x + 30, stage1.y+14, "Back", { font: "25px Arial", fill: " #00BFFF", align: "center" });
         backButton.inputEnabled = true;
         backButton2.inputEnabled = true;
-        backButton.events.onInputUp.add(Game1.back);
-        backButton2.events.onInputUp.add(Game1.back);
+        backButton.events.onInputUp.add(Game3.back);
+        backButton2.events.onInputUp.add(Game3.back);
     },
 
     addTurnBar: function(turn,ball){

@@ -150,7 +150,7 @@ var Game1={
     addOperator: function (head,operator,style) {
         newoperator = game.add.text(head.x-10,head.y+90,'+',style);
         newoperator.anchor.set(0.5);
-        game.add.image(head.x+212,head.y+7,'textbox')
+        game.add.image(head.x+212,head.y+7,'textbox');
         //game.physics.arcade.enable(operator);
         //operator.inputEnabled = true;
         //operator.push(newOperator);
