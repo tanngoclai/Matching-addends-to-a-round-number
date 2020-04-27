@@ -1,1 +1,2 @@
-# tanngoclai-RoundNumber_INT2208_Team27
+# tanngoclai-RoundNumber
+Phần mềm mô phỏng lại trò chơi trên Dragonlearn.io
