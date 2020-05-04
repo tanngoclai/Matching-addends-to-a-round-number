@@ -2,13 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c250b96d-e35f-47b7-b1ac-fd1ef7ee8243" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/assets/congratulation.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/gotoStart.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/congratulation.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/controller.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/controller.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/game1.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/game1.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/game2.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/game2.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/game3.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/game3.js" afterDir="false" />
     </list>
@@ -38,7 +32,7 @@
     <property name="DefaultHtmlFileTemplate" value="HTML File" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="D:/test/infinite-scrolling-demo-master" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="settings.editor.selected.configurable" value="project.propVCSSupport.Mappings" />
   </component>
@@ -96,7 +90,9 @@
       <workItem from="1587890630333" duration="9365000" />
       <workItem from="1587902243819" duration="25015000" />
       <workItem from="1587977285936" duration="29164000" />
-      <workItem from="1588013652146" duration="2871000" />
+      <workItem from="1588013652146" duration="5894000" />
+      <workItem from="1588040907315" duration="584000" />
+      <workItem from="1588597377597" duration="945000" />
     </task>
     <servers />
   </component>

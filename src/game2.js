@@ -8,8 +8,8 @@ var Game2={
         game.load.image("flag","assets/flag1.png");
         game.load.image("bag","assets/bag.png");
         game.load.image("bag2","assets/bag2.png");
-        game.load.image("textBox","assets/textBox.png");
-        game.load.image("textBox3","assets/textBox3.png");
+        game.load.image("textBox","assets/textbox.png");
+        game.load.image("textBox3","assets/textbox3.png");
     },
 
     back: function () {
@@ -191,7 +191,6 @@ Game2.StateA.prototype = {
         this.bag = [];
         this.textBag = [];
         value = [18,29,3,31];
-        //Game2.addBag(this,value,bounds);
         for(i=0; i<4; i++){
             newBag = game.add.sprite(this.markBag[i].x, this.markBag[i].y,"bag");
             game.physics.arcade.enable(newBag);
@@ -235,6 +234,12 @@ Game2.StateA.prototype = {
         }
 
         if(this.checkMatch){
+            if(this.car.body.velocity.x === 0) {
+                this.bag[bagInCar[0]].body.velocity.x = 0;
+                this.bag[bagInCar[0]].body.velocity.y = 0;
+                this.bag[bagInCar[1]].body.velocity.x = 0;
+                this.bag[bagInCar[1]].body.velocity.y = 0;
+            }
             Game2.updateBag(this,bagInCar);
             if(!checkRes1) Game2.showOperator1(this,textBox);
             if(checkRes1){
@@ -335,7 +340,6 @@ Game2.StateB.prototype = {
         this.bag = [];
         this.textBag = [];
         value = [32,14,26,15];
-        //Game2.addBag(this,value,bounds);
         for(i=0; i<4; i++){
             newBag = game.add.sprite(this.markBag[i].x, this.markBag[i].y,"bag");
             game.physics.arcade.enable(newBag);
@@ -379,6 +383,12 @@ Game2.StateB.prototype = {
         }
 
         if(this.checkMatch){
+            if(this.car.body.velocity.x === 0) {
+                this.bag[bagInCar[0]].body.velocity.x = 0;
+                this.bag[bagInCar[0]].body.velocity.y = 0;
+                this.bag[bagInCar[1]].body.velocity.x = 0;
+                this.bag[bagInCar[1]].body.velocity.y = 0;
+            }
             Game2.updateBag(this,bagInCar);
             if(!checkRes1) Game2.showOperator1(this,textBox);
             if(checkRes1){
@@ -479,7 +489,6 @@ Game2.StateC.prototype = {
         this.bag = [];
         this.textBag = [];
         value = [17,34,4,23];
-        //Game2.addBag(this,value,bounds);
         for(i=0; i<4; i++){
             newBag = game.add.sprite(this.markBag[i].x, this.markBag[i].y,"bag");
             game.physics.arcade.enable(newBag);
@@ -523,6 +532,12 @@ Game2.StateC.prototype = {
         }
 
         if(this.checkMatch){
+            if(this.car.body.velocity.x === 0) {
+                this.bag[bagInCar[0]].body.velocity.x = 0;
+                this.bag[bagInCar[0]].body.velocity.y = 0;
+                this.bag[bagInCar[1]].body.velocity.x = 0;
+                this.bag[bagInCar[1]].body.velocity.y = 0;
+            }
             Game2.updateBag(this,bagInCar);
             if(!checkRes1) Game2.showOperator1(this,textBox);
             if(checkRes1){
@@ -623,7 +638,6 @@ Game2.StateD.prototype = {
         this.bag = [];
         this.textBag = [];
         value = [3,8,6,4];
-        //Game2.addBag(this,value,bounds);
         for(i=0; i<4; i++){
             newBag = game.add.sprite(this.markBag[i].x, this.markBag[i].y,"bag");
             game.physics.arcade.enable(newBag);
@@ -667,6 +681,12 @@ Game2.StateD.prototype = {
         }
 
         if(this.checkMatch){
+            if(this.car.body.velocity.x === 0) {
+                this.bag[bagInCar[0]].body.velocity.x = 0;
+                this.bag[bagInCar[0]].body.velocity.y = 0;
+                this.bag[bagInCar[1]].body.velocity.x = 0;
+                this.bag[bagInCar[1]].body.velocity.y = 0;
+            }
             Game2.updateBag(this,bagInCar);
             if(!checkRes1) Game2.showOperator1(this,textBox);
             if(checkRes1){
