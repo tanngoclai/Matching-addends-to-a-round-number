@@ -14,7 +14,7 @@ I. Giới thiệu
 
 II. Thành viên tham gia
 
-  Lại Ngọc Tân - 18020049
+- Lại Ngọc Tân - 18020049
   
 III. Ràng buộc kĩ thuật
 
