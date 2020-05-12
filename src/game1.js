@@ -11,135 +11,211 @@ var Game1={
         game.load.image("textbox","assets/textbox.png");
     },
 
+    create: function(state){
+        game.physics.startSystem(Phaser.Physics.ARCADE);
+        state.add.image(0, 0, "background");
+        state.stage1 = game.add.sprite(game.world.width/2 - 475,25, "stage1" );
+
+        state.ball = [];
+        state.tail = [];
+        state.head = [];
+        state.flag = [];
+        state.textHead=[];
+        state.textTail=[];
+        state.matchHead=[-1,-1,-1];
+        state.checkMatch=[false,false,false];
+        state.checkRes=[false,false,false];
+        state.res=['','',''];
+
+        Game1.addBackButton(state);
+        Game1.addTurnBar(state);
+
+        Game1.addTail(state);
+        Game1.addHead(state);
+        Game1.addFlag(state);
+
+        Game1.addTextHead(state);
+        Game1.addTextTail(state);
+    },
+
+    update: function(state){
+        for(i=0;i<3;i++){
+            Game1.moveTail(i,state.stage1.x + 100,state.head[i].y,state);
+        }
+
+        Game1.updateTextHead(state);
+        Game1.updateTextTail(state);
+        Game1.updateFlag(state);
+
+        //Nhap ket qua dung
+        for(i=0;i<3;i++) {
+            if(state.checkMatch[i] && !state.checkRes[i]) {
+                Game1.inputRes(i,state);
+            }
+        }
+
+        //Neu 3 ket qua dung thi chuyen luot tiep theo
+        if(state.checkRes[0] && state.checkRes[1] && state.checkRes[2]) {
+            game.time.events.add(1000, state.nextState, state);
+            Game1.nextTurn(state);
+        }
+    },
+
     back: function () {
         game.state.start("Start");
     },
 
-    addBackButton: function (stage1) {
-        backButton = game.add.text(stage1.x + 5, stage1.y+7, "<", { font: "40px Arial", fill: " #00BFFF", align: "center" });
-        backButton2 = game.add.text(stage1.x + 30, stage1.y+14, "Back", { font: "25px Arial", fill: " #00BFFF", align: "center" });
+    addBackButton: function (state) {
+        backButton = game.add.text(state.stage1.x + 5, state.stage1.y+7, "<", { font: "40px Arial", fill: " #00BFFF", align: "center" });
+        backButton2 = game.add.text(state.stage1.x + 30, state.stage1.y+14, "Back", { font: "25px Arial", fill: " #00BFFF", align: "center" });
         backButton.inputEnabled = true;
         backButton2.inputEnabled = true;
         backButton.events.onInputUp.add(Game1.back);
         backButton2.events.onInputUp.add(Game1.back);
     },
 
-    addTurnBar: function(turn,ball){
+    addTurnBar: function(state){
 
         turnBar = game.add.image(game.world.width/2,50,"turnBar");
         turnBar.anchor.set(0.5);
 
-        for(i=0; i<turn; i++){
+        for(i=0; i<state.turn; i++){
             newBall = game.add.sprite(turnBar.x - turnBar.width/2 + 15 + i*23,turnBar.y,"turnBall");
             newBall.anchor.set(0.5);
             game.physics.arcade.enable(newBall);
-            ball.push(newBall);
+            state.ball.push(newBall);
         }
-        for(i=0; i<3-turn; i++){
+        for(i=0; i<3-state.turn; i++){
             newBall = game.add.sprite(turnBar.x + turnBar.width/2 - 15 - i*23,turnBar.y,"turnBall");
             newBall.anchor.set(0.5);
             game.physics.arcade.enable(newBall);
-            ball.push(newBall);
+            state.ball.push(newBall);
         }
     },
 
-    addTail: function (stage1,tail) {
+    addTail: function (state) {
+        bounds = new Phaser.Rectangle(game.world.width/2 - 473, 78, 608, 580);
         for(i=0;i<3;i++){
             if(i>0) {
-                newTail = game.add.sprite(stage1.x + 100, stage1.y + 75 + i*(25+tail[i-1].height), "tail");
+                newTail = game.add.sprite(state.stage1.x + 100, state.stage1.y + 75 + i*(25+state.tail[i-1].height), "tail");
             }
             else{
-                newTail = game.add.sprite(stage1.x + 100, stage1.y + 75, "tail");
+                newTail = game.add.sprite(state.stage1.x + 100, state.stage1.y + 75, "tail");
             }
             game.physics.arcade.enable(newTail);
             newTail.inputEnabled = true;
             newTail.input.enableDrag();
             newTail.input.boundsRect = bounds;
             newTail.outOfBoundsKill = true;
-            tail.push(newTail);
+            state.tail.push(newTail);
         }
     },
 
-    addHead: function (stage1,head,tail) {
+    addHead: function (state) {
         for(i=0;i<3;i++){
-            newHead = game.add.sprite(stage1.x + stage1.width - 266 - 75, tail[i].y, "head" );
+            newHead = game.add.sprite(state.stage1.x + state.stage1.width - 266 - 75, state.tail[i].y, "head" );
             game.physics.arcade.enable(newHead);
             newHead.inputEnabled = true;
-            head.push(newHead);
+            state.head.push(newHead);
         }
     },
 
-    addFlag: function (flag,head) {
+    addFlag: function (state) {
         for(i=0;i<3;i++){
-            newFlag = game.add.image(head[i].x+200,head[i].y-6,"flag");
-            flag.push(newFlag);
+            newFlag = game.add.image(state.head[i].x+200,state.head[i].y-6,"flag");
+            state.flag.push(newFlag);
         }
     },
 
-    addTextHead: function(textHead,valueHead,style){
+    addTextHead: function(state){
+        var style = { font: "32px Arial", fill: "#000"};
         for(i=0;i<3;i++){
-            newText = game.add.text(100, 100, valueHead[i], style);
+            newText = game.add.text(100, 100, state.valueHead[i], style);
             newText.anchor.set(0.5);
-            textHead.push(newText);
+            state.textHead.push(newText);
         }
     },
 
-    addTextTail: function(textTail,valueTail,style){
+    addTextTail: function(state){
+        var style = { font: "32px Arial", fill: "#000"};
         for(i=0;i<3;i++){
-            newText = game.add.text(100, 100, valueTail[i], style);
+            newText = game.add.text(100, 100, state.valueTail[i], style);
             newText.anchor.set(0.5);
-            textTail.push(newText);
+            state.textTail.push(newText);
         }
     },
 
-    moveTail: function (i,x,y,stage1,tail,head,valueHead,valueTail,checkMatch,matchHead,operator,state) {
-        var style={ font: "72px Arial", fill: "#000"};
+    updateTextHead: function(state){
+        for(i=0;i<3;i++){
+            state.textHead[i].x = Math.floor(state.head[i].x + state.head[i].width / 2 - 47);
+            state.textHead[i].y = Math.floor(state.head[i].y + state.head[i].height / 2 + 8 );
+        }
+    },
 
+    updateTextTail: function(state){
+        for(i=0;i<3;i++){
+            state.textTail[i].x = Math.floor(state.tail[i].x + state.tail[i].width / 2 + 1);
+            state.textTail[i].y = Math.floor(state.tail[i].y + state.tail[i].height / 2 + 8 );
+        }
+    },
+
+    updateFlag: function(state){
+        for(i=0;i<3;i++){
+            state.flag[i].x = Math.floor(state.head[i].x+200);
+            state.flag[i].y = Math.floor(state.head[i].y-6);
+        }
+    },
+
+    backIfFail: function(state){
+        for(i=0;i<3;i++){
+            if(state.matchHead[i]>-1 && !state.checkMatch[i]){
+                game.physics.arcade.moveToXY(state.tail[state.matchHead[i]], state.stage1.x + 100, state.head[i].y, 100, 100);
+                state.matchHead[i]=-1;
+            }
+        }
+    },
+
+    matchTailToHead: function(i,j,state){
+        // Ghep vao Head[j]
+        game.physics.arcade.moveToXY(state.tail[i], state.head[j].x - state.tail[j].width, state.head[j].y, 100, 100);
+        state.matchHead[j]=i;
+        if((state.valueTail[i]+state.valueHead[j])%10 === 0) {
+            //Neu ghep dung, hien phep tinh
+            if(!state.checkMatch[j]) Game1.addOperator(state.head[j]);
+            state.tail[i].input.disableDrag();
+            state.checkMatch[j]=true;
+        }
+        else{
+            //Neu ghep sai, quay ve vi tri ban dau
+            game.time.events.add(1500, state.backIfFail, state);
+        }
+    },
+
+    moveTail: function (i,x,y,state) {
         if(game.input.mousePointer.isDown ) {
-            tail[i].body.velocity.setTo(0, 0);
+            //Neu nhan chuot thi Tail khong di chuyen
+            state.tail[i].body.velocity.setTo(0, 0);
         }
         else {
-            if(tail[i].x !== x || tail[i].y !== y) {
-                if (tail[i].x < stage1.x + stage1.height/2) {
-                    game.physics.arcade.moveToXY(tail[i], x, y, 100, 100);
+            if(state.tail[i].x !== x || state.tail[i].y !== y) {
+                //Neu tail bi keo ra khoi vi tri ban dau va tha chuot
+                if (state.tail[i].x < state.stage1.x + state.stage1.height/2) {
+                    // Quay ve vi tri ban dau neu khong o gan Head nao
+                    game.physics.arcade.moveToXY(state.tail[i], x, y, 100, 100);
                 }
                 else {
-                    if (tail[i].y < head[1].y-head[0].height/2){
-                        game.physics.arcade.moveToXY(tail[i], head[0].x - tail[0].width, head[0].y, 100, 100);
-                        matchHead[0]=i;
-                        if((valueTail[i]+valueHead[0])%10 === 0) {
-                            if(!checkMatch[0]) Game1.addOperator(head[0],operator,style);
-                            tail[i].input.disableDrag();
-                            checkMatch[0]=true;
-                        }
-                        else{
-                            game.time.events.add(1500, state.backIfFail, state);
-                        }
+                    if (state.tail[i].y < state.head[1].y-state.head[0].height/2){
+                        //Neu o gan Head 0 thi ghep vao Head 0
+                        Game1.matchTailToHead(i,0,state);
                     }
                     else {
-                        if (tail[i].y < head[2].y-head[1].height/2) {
-                            game.physics.arcade.moveToXY(tail[i], head[0].x - tail[0].width, head[1].y, 100, 100);
-                            matchHead[1]=i;
-                            if ((valueTail[i]+valueHead[1])%10===0) {
-                                if(!checkMatch[1]) Game1.addOperator(head[1],operator,style);
-                                tail[i].input.disableDrag();
-                                checkMatch[1]=true;
-                            }
-                            else {
-                                game.time.events.add(1500, state.backIfFail, state);
-                            }
+                        if (state.tail[i].y < state.head[2].y-state.head[1].height/2) {
+                            //Neu o gan Head 1 thi ghep vao Head 1
+                            Game1.matchTailToHead(i,1,state);
                         }
                         else {
-                            game.physics.arcade.moveToXY(tail[i], head[0].x - tail[0].width, head[2].y, 100, 100);
-                            matchHead[2]=i;
-                            if ((valueTail[i]+valueHead[2])%10===0) {
-                                if(!checkMatch[2]) Game1.addOperator(head[2],operator,style);
-                                tail[i].input.disableDrag();
-                                checkMatch[2]=true;
-                            }
-                            else {
-                                game.time.events.add(1500, state.backIfFail, state);
-                            }
+                            //Neu o gan Head 2 thi ghep vao Head 2
+                            Game1.matchTailToHead(i,2,state);
                         }
                     }
                 }
@@ -147,31 +223,54 @@ var Game1={
         }
     },
 
-    addOperator: function (head,operator,style) {
+    addOperator: function (head) {
+        var style = { font: "64px Arial", fill: "#000"};
         newoperator = game.add.text(head.x-10,head.y+90,'+',style);
         newoperator.anchor.set(0.5);
         game.add.image(head.x+212,head.y+7,'textbox');
-        //game.physics.arcade.enable(operator);
-        //operator.inputEnabled = true;
-        //operator.push(newOperator);
     },
 
     inputRes:function(i,state){
         if(i===0) {
-            game.input.keyboard.addCallbacks(state, null, null, state.isTrueKey1);
+            game.input.keyboard.addCallbacks(state, null, null, Game1.isTrueKey1);
         }
         else if(i===1){
-            game.input.keyboard.addCallbacks(state, null, null, state.isTrueKey2);
+            game.input.keyboard.addCallbacks(state, null, null, Game1.isTrueKey2);
         }
         else {
-            game.input.keyboard.addCallbacks(state, null, null, state.isTrueKey3);
+            game.input.keyboard.addCallbacks(state, null, null, Game1.isTrueKey3);
         }
+    },
+
+    isTrueKey1: function(char){
+        Game1.inputTrueKey(0,char,this);
+    },
+
+    isTrueKey2: function(char){
+        Game1.inputTrueKey(1,char,this);
+    },
+
+    isTrueKey3: function(char){
+        Game1.inputTrueKey(2,char,this);
+    },
+
+    inputTrueKey: function(i,char,state){
+        //Ham kiem tra ket qua
+        if (state.res[i].length < 2) state.res[i] = state.res[i] + char;
+        if (state.res[i].length === 1) a1 = game.add.text(state.flag[i].x+20, state.flag[i].y+22, state.res[i]);
+        else if (state.res[i].length === 2) a2 = game.add.text(a1.x+20, a1.y, state.res[i].charAt(1));
+        trueRes = state.valueHead[i] + state.valueTail[state.matchHead[i]];
+        if (state.res[i].length === 2 && state.res[i] !== trueRes.toString()) {
+            a1.destroy();
+            a2.destroy();
+            state.res[i] = '';
+        }
+        else if (state.res[i]===trueRes.toString()) state.checkRes[i]=true;
     },
 
     nextTurn: function (state) {
         game.physics.arcade.moveToXY(state.ball[state.turn - 1], turnBar.x + turnBar.width/2 - 15 - 23*(3-state.turn), turnBar.y, 100, 200);
     }
-
 };
 
 
@@ -182,7 +281,14 @@ Game1.StateA = function () {
     this.tail;
     this.head;
     this.flag;
-    this.text;
+    this.valueHead=[42,13,34];
+    this.valueTail=[27,36,8];
+    this.textHead;
+    this.textTail;
+    this.matchHead;
+    this.checkMatch;
+    this.checkRes;
+    this.res;
 };
 
 Game1.StateA.prototype = {
@@ -192,126 +298,18 @@ Game1.StateA.prototype = {
     },
 
     create: function() {
-
-        game.physics.startSystem(Phaser.Physics.ARCADE);
-        this.add.image(0, 0, "background");
-        this.stage1 = game.add.sprite(game.world.width/2 - 475,25, "stage1" );
-        bounds = new Phaser.Rectangle(game.world.width/2 - 473, 78, 608, 580);
-
-        Game1.addBackButton(this.stage1);
-        this.ball = [];
-        Game1.addTurnBar(this.turn,this.ball);
-
-        this.tail=[];
-        Game1.addTail(this.stage1,this.tail);
-        this.head=[];
-        Game1.addHead(this.stage1,this.head,this.tail);
-        this.flag=[];
-        Game1.addFlag(this.flag,this.head);
-
-        var style = { font: "32px Arial", fill: "#000"};
-        valueHead=[42,13,34];
-        valueTail=[27,36,8];
-        textHead=[];
-        textTail=[];
-        Game1.addTextHead(textHead,valueHead,style);
-        Game1.addTextTail(textTail,valueTail,style);
-
-        checkMatch=[false,false,false];
-        checkRes=[false,false,false];
-        checkMoveCar=[false,false,false];
-        matchHead=[-1,-1,-1];
-
-        res=['','',''];
-        operator=[];
-
+        Game1.create(this);
     },
 
     update: function  () {
-        for(i=0;i<3;i++){
-                Game1.moveTail(i,this.stage1.x + 100, this.head[i].y,this.stage1,this.tail,this.head,valueHead,valueTail,checkMatch,matchHead,operator,this);
-        }
-
-        for(i=0;i<3;i++){
-            textHead[i].x = Math.floor(this.head[i].x + this.head[i].width / 2 - 47);
-            textHead[i].y = Math.floor(this.head[i].y + this.head[i].height / 2 + 8 );
-        }
-
-        for(i=0;i<3;i++){
-            textTail[i].x = Math.floor(this.tail[i].x + this.tail[i].width / 2 + 1);
-            textTail[i].y = Math.floor(this.tail[i].y + this.tail[i].height / 2 + 8 );
-        }
-
-        for(i=0;i<3;i++){
-            this.flag[i].x = Math.floor(this.head[i].x+200);
-            this.flag[i].y = Math.floor(this.head[i].y-6);
-        }
-
-        for(i=0;i<3;i++) {
-            if(checkMatch[i] && !checkRes[i]) {
-                Game1.inputRes(i,this);
-            }
-/*            if(checkMatch[i] && checkRes[i]){
-                this.tail[matchHead[i]].body.velocity.x=500;
-                this.head[i].body.velocity.x=500;
-            }*/
-        }
-
-        if(checkRes[0] && checkRes[1] && checkRes[2]) {
-            game.time.events.add(1000, this.gotoStateB, this);
-            Game1.nextTurn(this);
-        }
+        Game1.update(this);
     },
 
     backIfFail: function(){
-        for(i=0;i<3;i++){
-            if(matchHead[i]>-1 && !checkMatch[i]){
-                game.physics.arcade.moveToXY(this.tail[matchHead[i]], this.stage1.x + 100, this.head[i].y, 100, 100);
-                matchHead[i]=-1;
-            }
-        }
+        Game1.backIfFail(this);
     },
 
-    isTrueKey1: function(char){
-        if (res[0].length < 2) res[0] = res[0] + char;
-        if (res[0].length === 1) a1 = game.add.text(this.flag[0].x+20, this.flag[0].y+22, res[0]);
-        else if (res[0].length === 2) a2 = game.add.text(a1.x+20, a1.y, res[0].charAt(1));
-        trueRes = valueHead[0] + valueTail[matchHead[0]];
-        if (res[0].length === 2 && res[0] !== trueRes.toString()) {
-            a1.destroy();
-            a2.destroy();
-            res[0] = '';
-        }
-        else if (res[0]===trueRes.toString()) checkRes[0]=true;
-    },
-
-    isTrueKey2: function(char){
-        if (res[1].length < 2) res[1] = res[1] + char;
-        if (res[1].length === 1) a1 = game.add.text(this.flag[1].x+20, this.flag[1].y+22, res[1]);
-        else if (res[1].length === 2) a2 = game.add.text(a1.x+20, a1.y, res[1].charAt(1));
-        trueRes = valueHead[1] + valueTail[matchHead[1]];
-        if (res[1].length === 2 && res[1] !== trueRes.toString()) {
-            a1.destroy();
-            a2.destroy();
-            res[1] = '';
-        }
-        else if (res[1]===trueRes.toString()) checkRes[1]=true;
-    },
-
-    isTrueKey3: function(char){
-        if (res[2].length < 2) res[2] = res[2] + char;
-        if (res[2].length === 1) a1 = game.add.text(this.flag[2].x+20, this.flag[2].y+22, res[2]);
-        else if (res[2].length === 2) a2 = game.add.text(a1.x+20, a1.y, res[2].charAt(1));
-        trueRes = valueHead[2] + valueTail[matchHead[2]];
-        if (res[2].length === 2 && res[2] !== trueRes.toString()) {
-            a1.destroy();
-            a2.destroy();
-            res[2] = '';
-        }
-        else if (res[2]===trueRes.toString()) checkRes[2]=true;
-    },
-
-    gotoStateB: function () {
+    nextState: function () {
         game.state.start('Game1_StateB');
     }
 };
@@ -324,7 +322,14 @@ Game1.StateB = function () {
     this.tail;
     this.head;
     this.flag;
-    this.text;
+    this.valueHead=[16,57,39];
+    this.valueTail=[23,24,11];
+    this.textHead;
+    this.textTail;
+    this.matchHead;
+    this.checkMatch;
+    this.checkRes;
+    this.res;
 };
 
 Game1.StateB.prototype = {
@@ -334,126 +339,18 @@ Game1.StateB.prototype = {
     },
 
     create: function() {
-
-        game.physics.startSystem(Phaser.Physics.ARCADE);
-        this.add.image(0, 0, "background");
-        this.stage1 = game.add.sprite(game.world.width/2 - 475,25, "stage1" );
-        bounds = new Phaser.Rectangle(game.world.width/2 - 473, 78, 608, 580);
-
-        Game1.addBackButton(this.stage1);
-        this.ball = [];
-        Game1.addTurnBar(this.turn,this.ball);
-
-        this.tail=[];
-        Game1.addTail(this.stage1,this.tail);
-        this.head=[];
-        Game1.addHead(this.stage1,this.head,this.tail);
-        this.flag=[];
-        Game1.addFlag(this.flag,this.head);
-
-        var style = { font: "32px Arial", fill: "#000"};
-        valueHead=[16,57,39];
-        valueTail=[23,24,11];
-        textHead=[];
-        textTail=[];
-        Game1.addTextHead(textHead,valueHead,style);
-        Game1.addTextTail(textTail,valueTail,style);
-
-        checkMatch=[false,false,false];
-        checkRes=[false,false,false];
-        checkMoveCar=[false,false,false];
-        matchHead=[-1,-1,-1];
-
-        res=['','',''];
-        operator=[];
-
+        Game1.create(this);
     },
 
     update: function  () {
-        for(i=0;i<3;i++){
-            Game1.moveTail(i,this.stage1.x + 100, this.head[i].y,this.stage1,this.tail,this.head,valueHead,valueTail,checkMatch,matchHead,operator,this);
-        }
-
-        for(i=0;i<3;i++){
-            textHead[i].x = Math.floor(this.head[i].x + this.head[i].width / 2 - 47);
-            textHead[i].y = Math.floor(this.head[i].y + this.head[i].height / 2 + 8 );
-        }
-
-        for(i=0;i<3;i++){
-            textTail[i].x = Math.floor(this.tail[i].x + this.tail[i].width / 2 + 1);
-            textTail[i].y = Math.floor(this.tail[i].y + this.tail[i].height / 2 + 8 );
-        }
-
-        for(i=0;i<3;i++){
-            this.flag[i].x = Math.floor(this.head[i].x+200);
-            this.flag[i].y = Math.floor(this.head[i].y-6);
-        }
-
-        for(i=0;i<3;i++) {
-            if(checkMatch[i] && !checkRes[i]) {
-                Game1.inputRes(i,this);
-            }
-            /*            if(checkMatch[i] && checkRes[i]){
-                            this.tail[matchHead[i]].body.velocity.x=500;
-                            this.head[i].body.velocity.x=500;
-                        }*/
-        }
-
-        if(checkRes[0] && checkRes[1] && checkRes[2]) {
-            game.time.events.add(1000, this.gotoStateC, this);
-            Game1.nextTurn(this);
-        }
+        Game1.update(this);
     },
 
     backIfFail: function(){
-        for(i=0;i<3;i++){
-            if(matchHead[i]>-1 && !checkMatch[i]){
-                game.physics.arcade.moveToXY(this.tail[matchHead[i]], this.stage1.x + 100, this.head[i].y, 100, 100);
-                matchHead[i]=-1;
-            }
-        }
+        Game1.backIfFail(this);
     },
 
-    isTrueKey1: function(char){
-        if (res[0].length < 2) res[0] = res[0] + char;
-        if (res[0].length === 1) a1 = game.add.text(this.flag[0].x+20, this.flag[0].y+22, res[0]);
-        else if (res[0].length === 2) a2 = game.add.text(a1.x+20, a1.y, res[0].charAt(1));
-        trueRes = valueHead[0] + valueTail[matchHead[0]];
-        if (res[0].length === 2 && res[0] !== trueRes.toString()) {
-            a1.destroy();
-            a2.destroy();
-            res[0] = '';
-        }
-        else if (res[0]===trueRes.toString()) checkRes[0]=true;
-    },
-
-    isTrueKey2: function(char){
-        if (res[1].length < 2) res[1] = res[1] + char;
-        if (res[1].length === 1) a1 = game.add.text(this.flag[1].x+20, this.flag[1].y+22, res[1]);
-        else if (res[1].length === 2) a2 = game.add.text(a1.x+20, a1.y, res[1].charAt(1));
-        trueRes = valueHead[1] + valueTail[matchHead[1]];
-        if (res[1].length === 2 && res[1] !== trueRes.toString()) {
-            a1.destroy();
-            a2.destroy();
-            res[1] = '';
-        }
-        else if (res[1]===trueRes.toString()) checkRes[1]=true;
-    },
-
-    isTrueKey3: function(char){
-        if (res[2].length < 2) res[2] = res[2] + char;
-        if (res[2].length === 1) a1 = game.add.text(this.flag[2].x+20, this.flag[2].y+22, res[2]);
-        else if (res[2].length === 2) a2 = game.add.text(a1.x+20, a1.y, res[2].charAt(1));
-        trueRes = valueHead[2] + valueTail[matchHead[2]];
-        if (res[2].length === 2 && res[2] !== trueRes.toString()) {
-            a1.destroy();
-            a2.destroy();
-            res[2] = '';
-        }
-        else if (res[2]===trueRes.toString()) checkRes[2]=true;
-    },
-
-    gotoStateC: function () {
+    nextState: function () {
         game.state.start('Game1_StateC');
     }
 };
@@ -466,7 +363,14 @@ Game1.StateC = function () {
     this.tail;
     this.head;
     this.flag;
-    this.text;
+    this.valueHead=[35,64,23];
+    this.valueTail=[37,26,45];
+    this.textHead;
+    this.textTail;
+    this.matchHead;
+    this.checkMatch;
+    this.checkRes;
+    this.res;
 };
 
 Game1.StateC.prototype = {
@@ -476,126 +380,18 @@ Game1.StateC.prototype = {
     },
 
     create: function() {
-
-        game.physics.startSystem(Phaser.Physics.ARCADE);
-        this.add.image(0, 0, "background");
-        this.stage1 = game.add.sprite(game.world.width/2 - 475,25, "stage1" );
-        bounds = new Phaser.Rectangle(game.world.width/2 - 473, 78, 608, 580);
-
-        Game1.addBackButton(this.stage1);
-        this.ball = [];
-        Game1.addTurnBar(this.turn,this.ball);
-
-        this.tail=[];
-        Game1.addTail(this.stage1,this.tail);
-        this.head=[];
-        Game1.addHead(this.stage1,this.head,this.tail);
-        this.flag=[];
-        Game1.addFlag(this.flag,this.head);
-
-        var style = { font: "32px Arial", fill: "#000"};
-        valueHead=[35,64,23];
-        valueTail=[37,26,45];
-        textHead=[];
-        textTail=[];
-        Game1.addTextHead(textHead,valueHead,style);
-        Game1.addTextTail(textTail,valueTail,style);
-
-        checkMatch=[false,false,false];
-        checkRes=[false,false,false];
-        checkMoveCar=[false,false,false];
-        matchHead=[-1,-1,-1];
-
-        res=['','',''];
-        operator=[];
-
+        Game1.create(this);
     },
 
     update: function  () {
-        for(i=0;i<3;i++){
-            Game1.moveTail(i,this.stage1.x + 100, this.head[i].y,this.stage1,this.tail,this.head,valueHead,valueTail,checkMatch,matchHead,operator,this);
-        }
-
-        for(i=0;i<3;i++){
-            textHead[i].x = Math.floor(this.head[i].x + this.head[i].width / 2 - 47);
-            textHead[i].y = Math.floor(this.head[i].y + this.head[i].height / 2 + 8 );
-        }
-
-        for(i=0;i<3;i++){
-            textTail[i].x = Math.floor(this.tail[i].x + this.tail[i].width / 2 + 1);
-            textTail[i].y = Math.floor(this.tail[i].y + this.tail[i].height / 2 + 8 );
-        }
-
-        for(i=0;i<3;i++){
-            this.flag[i].x = Math.floor(this.head[i].x+200);
-            this.flag[i].y = Math.floor(this.head[i].y-6);
-        }
-
-        for(i=0;i<3;i++) {
-            if(checkMatch[i] && !checkRes[i]) {
-                Game1.inputRes(i,this);
-            }
-            /*if(checkMatch[i] && checkRes[i]){
-                this.tail[matchHead[i]].body.velocity.x=500;
-                this.head[i].body.velocity.x=500;
-            }*/
-        }
-
-        if(checkRes[0] && checkRes[1] && checkRes[2]) {
-            game.time.events.add(1000, this.winGame, this);
-            Game1.nextTurn(this);
-        }
+        Game1.update(this);
     },
 
     backIfFail: function(){
-        for(i=0;i<3;i++){
-            if(matchHead[i]>-1 && !checkMatch[i]){
-                game.physics.arcade.moveToXY(this.tail[matchHead[i]], this.stage1.x + 100, this.head[i].y, 100, 100);
-                matchHead[i]=-1;
-            }
-        }
+        Game1.backIfFail(this);
     },
 
-    isTrueKey1: function(char){
-        if (res[0].length < 2) res[0] = res[0] + char;
-        if (res[0].length === 1) a1 = game.add.text(this.flag[0].x+20, this.flag[0].y+22, res[0]);
-        else if (res[0].length === 2) a2 = game.add.text(a1.x+20, a1.y, res[0].charAt(1));
-        trueRes = valueHead[0] + valueTail[matchHead[0]];
-        if (res[0].length === 2 && res[0] !== trueRes.toString()) {
-            a1.destroy();
-            a2.destroy();
-            res[0] = '';
-        }
-        else if (res[0]===trueRes.toString()) checkRes[0]=true;
-    },
-
-    isTrueKey2: function(char){
-        if (res[1].length < 2) res[1] = res[1] + char;
-        if (res[1].length === 1) a1 = game.add.text(this.flag[1].x+20, this.flag[1].y+22, res[1]);
-        else if (res[1].length === 2) a2 = game.add.text(a1.x+20, a1.y, res[1].charAt(1));
-        trueRes = valueHead[1] + valueTail[matchHead[1]];
-        if (res[1].length === 2 && res[1] !== trueRes.toString()) {
-            a1.destroy();
-            a2.destroy();
-            res[1] = '';
-        }
-        else if (res[1]===trueRes.toString()) checkRes[1]=true;
-    },
-
-    isTrueKey3: function(char){
-        if (res[2].length < 2) res[2] = res[2] + char;
-        if (res[2].length === 1) a1 = game.add.text(this.flag[2].x+20, this.flag[2].y+22, res[2]);
-        else if (res[2].length === 2) a2 = game.add.text(a1.x+20, a1.y, res[2].charAt(1));
-        trueRes = valueHead[2] + valueTail[matchHead[2]];
-        if (res[2].length === 2 && res[2] !== trueRes.toString()) {
-            a1.destroy();
-            a2.destroy();
-            res[2] = '';
-        }
-        else if (res[2]===trueRes.toString()) checkRes[2]=true;
-    },
-
-    winGame: function () {
+    nextState: function () {
         game.state.start("Congratulation");
     }
 };

@@ -3,7 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="c250b96d-e35f-47b7-b1ac-fd1ef7ee8243" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/game2.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/game2.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/game1.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/game1.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/game3.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/game3.js" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -32,7 +32,7 @@
     <property name="DefaultHtmlFileTemplate" value="HTML File" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="last_opened_file_path" value="D:/test/infinite-scrolling-demo-master" />
+    <property name="last_opened_file_path" value="D:/test/Matching-addends-to-a-round-number-master" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="settings.editor.selected.configurable" value="project.propVCSSupport.Mappings" />
   </component>
@@ -92,7 +92,14 @@
       <workItem from="1587977285936" duration="29164000" />
       <workItem from="1588013652146" duration="5894000" />
       <workItem from="1588040907315" duration="584000" />
-      <workItem from="1588597377597" duration="945000" />
+      <workItem from="1588597377597" duration="3102000" />
+      <workItem from="1588685660057" duration="147000" />
+      <workItem from="1588687093013" duration="442000" />
+      <workItem from="1588696272827" duration="1140000" />
+      <workItem from="1589277279466" duration="3413000" />
+      <workItem from="1589291403118" duration="6918000" />
+      <workItem from="1589300628315" duration="3408000" />
+      <workItem from="1589305194204" duration="1580000" />
     </task>
     <servers />
   </component>
