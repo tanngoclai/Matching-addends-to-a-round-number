@@ -10,35 +10,123 @@ var Game3={
         game.load.image("textBox","assets/textBox3.png");
     },
 
+    create: function(state) {
+
+        game.physics.startSystem(Phaser.Physics.ARCADE);
+        state.add.image(0, 0, "background");
+        state.stage1 = game.add.sprite(game.world.width/2 - 475,25, "stage1" );
+
+        state.ball = [];
+        state.blank=[];
+        state.textDefault = [];
+        state.box=[];
+        state.textBox=[];
+
+        Game3.addBackButton(state);
+        Game3.addTurnBar(state);
+        Game3.addBlank(state);
+        Game3.addTextDefault(state);
+        Game3.addBox(state);
+        Game3.addTextBox(state);
+
+        //Xac dinh gia tri ghep voi gia tri o vi tri 0
+        if((state.value[1]+state.value[0]) % 10 === 0) {
+            state.pairWithValue0 = 1;
+            state.notPairWithValue0 = 2;
+        }
+        else {
+            state.pairWithValue0 = 2;
+            state.notPairWithValue0 = 1;
+        }
+
+        state.bracket = state.add.sprite(state.blank[0].x, state.blank[0].y + state.blank[0].height + 4,'bracket');
+        state.bracket.visible = false;
+
+        state.ballRes = state.add.sprite(state.bracket.x + state.bracket.width/2, state.bracket.y+60,'ballRes');
+        state.ballRes.anchor.set(0.5);
+        game.physics.arcade.enable(state.ballRes);
+        state.ballRes.inputEnabled = true;
+        state.ballRes.visible = false;
+
+        state.textRes = state.game.add.text(state.ballRes.x, state.ballRes.y+5, state.value[0]+state.value[state.pairWithValue0],{font: "32px Arial", fill: "#000"});
+        state.textRes.anchor.set(0.5);
+        state.textRes.visible = false;
+
+        state.isEmpty = [true,true,true];
+        state.effectStart = true;
+        state.endStep1 = false;
+        state.endStep2 = false;
+        state.endGame = false;
+        state.result = '';
+    },
+
+    update: function (state){
+        //Hieu ung khi bat dau game
+        if(state.effectStart) {
+            for (i = 1; i < 3; i++) {
+                Game3.moveToBlank(state, i, state.stage1.x + 10 + i * 150, state.stage1.y + 75);
+            }
+            state.box[0].input.disableDrag();
+            state.game.physics.arcade.moveToXY(state.box[0], state.blank[0].x, state.blank[0].y, 100, 350);
+            if (state.isEmpty[0]) {
+                game.time.events.add(600, state.addBracket, state);
+            }
+        }
+
+        Game3.updateTextBox(state);
+        Game3.updateTextRes(state);
+
+        //Khi ghep dung cac gia tri vao vi tri tuong ung
+        if(!state.isEmpty[0] && !state.isEmpty[1] && !state.isEmpty[2]){
+            state.game.time.events.add(500, state.showOperator, state);
+        }
+
+        //Khi ket thuc buoc 1
+        if(state.endStep1) {
+            state.game.time.events.add(800, state.destroyToShowOperator, state);
+        }
+
+        //Khi ket thuc buoc 2
+        if(state.endStep2) {
+            game.input.keyboard.addCallbacks(state, null, null, state.inputTrueRes);
+        }
+
+        //Khi hoan thanh luot choi
+        if(state.endGame) {
+            game.time.events.add(1000, state.nextState, state);
+            Game3.nextTurn(state);
+        }
+    },
+
     back: function () {
         game.state.start("Start");
     },
 
-    addBackButton: function (stage1) {
-        backButton = game.add.text(stage1.x + 5, stage1.y+7, "<", { font: "40px Arial", fill: " #00BFFF", align: "center" });
-        backButton2 = game.add.text(stage1.x + 30, stage1.y+14, "Back", { font: "25px Arial", fill: " #00BFFF", align: "center" });
+    addBackButton: function (state) {
+        backButton = game.add.text(state.stage1.x + 5, state.stage1.y+7, "<", { font: "40px Arial", fill: " #00BFFF", align: "center" });
+        backButton2 = game.add.text(state.stage1.x + 30, state.stage1.y+14, "Back", { font: "25px Arial", fill: " #00BFFF", align: "center" });
         backButton.inputEnabled = true;
         backButton2.inputEnabled = true;
         backButton.events.onInputUp.add(Game3.back);
         backButton2.events.onInputUp.add(Game3.back);
     },
 
-    addTurnBar: function(turn,ball){
+    addTurnBar: function(state){
 
         turnBar = game.add.image(game.world.width/2,50,"turnBar");
         turnBar.anchor.set(0.5);
 
-        for(i=0; i<turn; i++){
+        for(i=0; i<state.turn; i++){
             newBall = game.add.sprite(turnBar.x - turnBar.width/2 + 15 + i*23,turnBar.y,"turnBall");
             newBall.anchor.set(0.5);
             game.physics.arcade.enable(newBall);
-            ball.push(newBall);
+            state.ball.push(newBall);
         }
-        for(i=0; i<6-turn; i++){
+        for(i=0; i<6-state.turn; i++){
             newBall = game.add.sprite(turnBar.x + turnBar.width/2 - 15 - i*23,turnBar.y,"turnBall");
             newBall.anchor.set(0.5);
             game.physics.arcade.enable(newBall);
-            ball.push(newBall);
+            state.ball.push(newBall);
         }
     },
 
@@ -70,7 +158,7 @@ var Game3={
         }
     },
 
-    addTextDefault:function(state,textDefault){
+    addTextDefault:function(state){
         style = { font: "48px Arial", fill: "#000"};
         for(i=0;i<3;i++){
             if(i > 0){
@@ -79,15 +167,15 @@ var Game3={
             else {
                 newText=game.add.text(state.stage1.x + 20, state.stage1.y + 88,state.value[i].toString(),style);
             }
-            textDefault.push(newText);
+            state.textDefault.push(newText);
         }
         equal = game.add.text(state.stage1.x + 470, state.stage1.y + 88,'=',style);
         questionMark = game.add.text(state.stage1.x + 520, state.stage1.y + 88,'?',style);
-        textDefault.push(equal);
-        textDefault.push(questionMark);
+        state.textDefault.push(equal);
+        state.textDefault.push(questionMark);
     },
 
-    addTextBox:function(state,textBox){
+    addTextBox:function(state){
         style = { font: "48px Arial", fill: "#000"};
         for(i=0;i<3;i++){
             if(i > 0){
@@ -97,20 +185,27 @@ var Game3={
                 newText=game.add.text(100, 100,state.value[i].toString(),style);
             }
             newText.anchor.set(0.5);
-            textBox.push(newText);
+            state.textBox.push(newText);
         }
     },
 
-    updateTextBox: function(state,textBox){
+    addBracket:function(state){
+        state.bracket.visible = true;
+        state.ballRes.visible = true;
+        state.textRes.visible = true;
+        state.isEmpty[0]=false;
+    },
+
+    updateTextBox: function(state){
         for(i=0; i<3; i++){
-            textBox[i].x = Math.floor(state.box[i].x + state.box[i].width/2);
-            textBox[i].y = Math.floor(state.box[i].y + state.box[i].height/2+8);
+            state.textBox[i].x = Math.floor(state.box[i].x + state.box[i].width/2);
+            state.textBox[i].y = Math.floor(state.box[i].y + state.box[i].height/2+8);
         }
     },
 
-    updateTextRes: function(ballRes,textRes){
-        textRes.x = Math.floor(ballRes.x);
-        textRes.y = Math.floor(ballRes.y+5);
+    updateTextRes: function(state){
+        state.textRes.x = Math.floor(state.ballRes.x);
+        state.textRes.y = Math.floor(state.ballRes.y+5);
     },
 
     moveToBlank: function (state,i,x,y) {
@@ -120,10 +215,7 @@ var Game3={
         else{
             if(state.box[i].x !== x || state.box[i].y !== y) {
                 if (i === state.pairWithValue0) {
-                    if(state.box[i].x > state.blank[1].x - state.blank[1].width
-                        && state.box[i].x < state.blank[1].x + state.blank[1].width
-                        && state.box[i].y > state.blank[1].y - state.blank[1].height
-                        && state.box[i].x < state.blank[1].x + state.blank[1].height){
+                    if(Game3.isAroundBlank1(state,i)){
                         game.physics.arcade.moveToXY(state.box[i], state.blank[1].x, state.blank[1].y,100,200);
                         state.box[i].input.disableDrag();
                         state.isEmpty[1]=false;
@@ -132,10 +224,7 @@ var Game3={
                 }
                 else {
                     if(!state.isEmpty[1]){
-                        if(state.box[i].x > state.blank[2].x - state.blank[2].width
-                            && state.box[i].x < state.blank[2].x + state.blank[2].width
-                            && state.box[i].y > state.blank[2].y - state.blank[2].height
-                            && state.box[i].x < state.blank[2].x + state.blank[2].height){
+                        if(Game3.isAroundBlank2(state,i)){
                             game.physics.arcade.moveToXY(state.box[i], state.blank[2].x, state.blank[2].y,100,200);
                             state.box[i].input.disableDrag();
                             state.isEmpty[2]=false;
@@ -143,10 +232,7 @@ var Game3={
                         else game.physics.arcade.moveToXY(state.box[i], x, y,100,200);
                     }
                     else {
-                        if(state.box[i].x > state.blank[1].x - state.blank[1].width
-                            && state.box[i].x < state.blank[1].x + state.blank[1].width
-                            && state.box[i].y > state.blank[1].y - state.blank[1].height
-                            && state.box[i].x < state.blank[1].x + state.blank[1].height){
+                        if(Game3.isAroundBlank1(state,i)){
                             game.physics.arcade.moveToXY(state.box[i], state.blank[1].x, state.blank[1].y,100,200);
                             game.time.events.add(1000, state.backIfFail, state);
                         }
@@ -155,6 +241,80 @@ var Game3={
                 }
             }
         }
+    },
+
+    isAroundBlank1:function(state,i){
+        return state.box[i].x > state.blank[1].x - state.blank[1].width
+            && state.box[i].x < state.blank[1].x + state.blank[1].width
+            && state.box[i].y > state.blank[1].y - state.blank[1].height
+            && state.box[i].x < state.blank[1].x + state.blank[1].height;
+    },
+
+    isAroundBlank2:function(state,i){
+        return state.box[i].x > state.blank[2].x - state.blank[2].width
+            && state.box[i].x < state.blank[2].x + state.blank[2].width
+            && state.box[i].y > state.blank[2].y - state.blank[2].height
+            && state.box[i].x < state.blank[2].x + state.blank[2].height;
+    },
+
+    backIfFail: function (state) {
+        for(i=1;i<3;i++){
+            if(i !== state.pairWithValue0) {
+                game.physics.arcade.moveToXY(state.box[i], state.stage1.x + 10+ i*(10+state.box[i-1].width), state.stage1.y + 75, 100, 100);
+            }
+        }
+    },
+
+    showOperator:function(state){
+        state.textDefault[1].x = state.textDefault[0].x+60;
+        state.textDefault[2].x = state.textDefault[1].x+110;
+        state.textDefault[3].x = state.textDefault[2].x+110;
+        state.textDefault[4].destroy();
+        game.time.events.add(500, state.destroyBox,state);
+    },
+
+    destroyBox:function(state){
+        state.effectStart = false;
+        state.textBox[0].destroy();
+        state.textBox[state.pairWithValue0].destroy();
+        state.box[0].destroy();
+        state.box[state.pairWithValue0].destroy();
+        state.blank[0].destroy();
+        state.blank[1].destroy();
+        state.blank[2].destroy();
+        state.bracket.destroy();
+        game.physics.arcade.moveToXY(state.ballRes,state.textDefault[3].x + 70, state.textDefault[3].y+23, 200, 200);
+        game.physics.arcade.moveToXY(state.box[state.notPairWithValue0],state.textDefault[3].x + 110, state.textDefault[3].y-15, 200, 200);
+        state.endStep1=true;
+    },
+
+    destroyToShowOperator:function(state){
+        state.textRes.destroy();
+        state.ballRes.destroy();
+        state.box[state.notPairWithValue0].destroy();
+        game.time.events.add(100, state.addLast,state);
+    },
+
+    addLast:function(state){
+        if(!state.endStep2) {
+            game.add.text(state.textDefault[3].x + 60, state.textDefault[3].y, state.value[0] + state.value[state.pairWithValue0],{font: "48px Arial", fill: "#000"});
+            game.add.text(state.textDefault[3].x + 240, state.textDefault[3].y, '=',{font: "48px Arial", fill: "#000"});
+            game.add.image(state.textDefault[3].x + 280, state.textDefault[3].y-5, 'textBox');
+            state.endStep2 = true;
+        }
+    },
+
+    inputTrueRes:function (char,state) {
+        if (state.result.length < 2) state.result = state.result + char;
+        if (state.result.length === 1) a1 = game.add.text(state.textDefault[3].x + 288, state.textDefault[3].y+3, state.result,{font: "48px Arial", fill: "#000"});
+        else if (state.result.length === 2) a2 = game.add.text(a1.x+30, a1.y, state.result.charAt(1),{font: "48px Arial", fill: "#000"});
+        trueRes = state.value[0]+state.value[1]+state.value[2];
+        if (state.result.length === 2 && state.result !== trueRes.toString()) {
+            a1.destroy();
+            a2.destroy();
+            state.result = '';
+        }
+        else if (state.result === trueRes.toString()) state.endGame=true;
     },
 
     nextTurn: function (state) {
@@ -178,9 +338,9 @@ Game3.StateA = function (){
     this.bracket;
     this.ballRes;
     this.textRes;
-    this.start;
-    this.end;
-    this.end2;
+    this.effectStart;
+    this.endStep1;
+    this.endStep2;
     this.endGame;
     this.result;
 };
@@ -191,156 +351,42 @@ Game3.StateA.prototype = {
     },
 
     create: function() {
-
-        game.physics.startSystem(Phaser.Physics.ARCADE);
-        this.add.image(0, 0, "background");
-        this.stage1 = game.add.sprite(game.world.width/2 - 475,25, "stage1" );
-
-        Game3.addBackButton(this.stage1);
-        this.ball = [];
-        Game3.addTurnBar(this.turn,this.ball);
-
-        this.blank=[];
-        Game3.addBlank(this);
-
-        this.textDefault = [];
-        Game3.addTextDefault(this,this.textDefault);
-        this.box=[];
-        this.textBox=[];
-        Game3.addBox(this);
-        Game3.addTextBox(this,this.textBox);
-
-        if((this.value[1]+this.value[0]) % 10 === 0) {
-            this.pairWithValue0 = 1;
-            this.notPairWithValue0 = 2;
-        }
-        else {
-            this.pairWithValue0 = 2;
-            this.notPairWithValue0 = 1;
-        }
-
-        this.bracket = this.add.sprite(this.blank[0].x, this.blank[0].y + this.blank[0].height + 4,'bracket');
-        this.ballRes = this.add.sprite(this.bracket.x + this.bracket.width/2, this.bracket.y+60,'ballRes');
-        this.ballRes.anchor.set(0.5);
-        game.physics.arcade.enable(this.ballRes);
-        this.ballRes.inputEnabled = true;
-        this.textRes = this.game.add.text(this.ballRes.x, this.ballRes.y+5, this.value[0]+this.value[this.pairWithValue0],{font: "32px Arial", fill: "#000"});
-        this.textRes.anchor.set(0.5);
-        this.bracket.visible = false;
-        this.ballRes.visible = false;
-        this.textRes.visible = false;
-
-        this.isEmpty = [true,true,true];
-        this.start = true;
-        this.end = false;
-        this.end2 = false;
-        this.endGame = false;
-        this.result = '';
+        Game3.create(this);
     },
 
     update: function (){
-        if(this.start) {
-            for (i = 1; i < 3; i++) {
-                Game3.moveToBlank(this, i, this.stage1.x + 10 + i * 150, this.stage1.y + 75);
-            }
-            this.box[0].input.disableDrag();
-            this.game.physics.arcade.moveToXY(this.box[0], this.blank[0].x, this.blank[0].y, 100, 350);
-            if (this.isEmpty[0]) {
-                game.time.events.add(600, this.addBracket, this);
-            }
-        }
-
-        Game3.updateTextBox(this, this.textBox);
-        Game3.updateTextRes(this.ballRes,this.textRes);
-        if(!this.isEmpty[0] && !this.isEmpty[1] && !this.isEmpty[2]){
-            this.game.time.events.add(500, this.showOperator, this);
-        }
-
-        if(this.end) this.game.time.events.add(800, this.destroy2, this);
-        game.input.keyboard.addCallbacks(this, null, null, this.isTrueRes);
-
-        if(this.endGame) {
-            game.time.events.add(1000, this.gotoStateB, this);
-            Game3.nextTurn(this);
-        }
+        Game3.update(this);
     },
 
     addBracket:function () {
-        this.bracket.visible = true;
-        this.ballRes.visible = true;
-        this.textRes.visible = true;
-        this.isEmpty[0]=false;
+        Game3.addBracket(this);
     },
 
     backIfFail: function () {
-        for(i=1;i<3;i++){
-            if(i !== this.pairWithValue0) {
-                game.physics.arcade.moveToXY(this.box[i], this.stage1.x + 10+ i*(10+this.box[i-1].width), this.stage1.y + 75, 100, 100);
-            }
-        }
+        Game3.backIfFail(this);
     },
 
     showOperator: function(){
-        this.textDefault[1].x = this.textDefault[0].x+45;
-        this.textDefault[2].x = this.textDefault[1].x+110;
-        this.textDefault[3].x = this.textDefault[2].x+110;
-        this.textDefault[4].destroy();
-        game.time.events.add(500, this.destroyBox,this);
+        Game3.showOperator(this);
     },
 
     destroyBox: function () {
-        this.start = false;
-        this.textBox[0].destroy();
-        this.textBox[this.pairWithValue0].destroy();
-        this.box[0].destroy();
-        this.box[this.pairWithValue0].destroy();
-        this.blank[0].destroy();
-        this.blank[1].destroy();
-        this.blank[2].destroy();
-        this.bracket.destroy();
-        game.physics.arcade.moveToXY(this.ballRes,this.textDefault[3].x + 70, this.textDefault[3].y+23, 200, 200);
-        game.physics.arcade.moveToXY(this.box[this.notPairWithValue0],this.textDefault[3].x + 110, this.textDefault[3].y-15, 200, 200);
-        this.end=true;
+        Game3.destroyBox(this);
     },
 
-    destroy2: function () {
-        this.textRes.destroy();
-        this.ballRes.destroy();
-        this.box[this.notPairWithValue0].destroy();
-        game.time.events.add(100, this.addLast,this);
+    destroyToShowOperator: function () {
+        Game3.destroyToShowOperator(this);
     },
 
     addLast: function () {
-        if(!this.end2) {
-            game.add.text(this.textDefault[3].x + 60, this.textDefault[3].y, this.value[0] + this.value[this.pairWithValue0],{font: "48px Arial", fill: "#000"});
-            game.add.text(this.textDefault[3].x + 240, this.textDefault[3].y, '=',{font: "48px Arial", fill: "#000"});
-            game.add.image(this.textDefault[3].x + 280, this.textDefault[3].y-5, 'textBox');
-            this.end2 = true;
-        }
+        Game3.addLast(this);
     },
 
-    isTrueRes:function (char) {
-        if (this.result.length < 2) this.result = this.result + char;
-        if (this.result.length === 1) a1 = game.add.text(this.textDefault[3].x + 288, this.textDefault[3].y+3, this.result,{font: "48px Arial", fill: "#000"});
-        else if (this.result.length === 2) a2 = game.add.text(a1.x+30, a1.y, this.result.charAt(1),{font: "48px Arial", fill: "#000"});
-        trueRes = this.value[0]+this.value[1]+this.value[2];
-        if (this.result.length === 2 && this.result !== trueRes.toString()) {
-            a1.destroy();
-            a2.destroy();
-            this.result = '';
-        }
-        else if (this.result === trueRes.toString()) this.endGame=true;
+    inputTrueRes:function (char) {
+        Game3.inputTrueRes(char,this);
     },
 
-    nextTurn: function () {
-        if(this.endGame) {
-            a=this.game.time.events.add(1000, this.gotoStateB, this);
-            game.physics.arcade.moveToXY(this.ball[5], turnBar.x + turnBar.width/2 - 15, turnBar.y, 100, 200);
-
-        }
-    },
-
-    gotoStateB: function () {
+    nextState: function () {
         game.state.start('Game3_StateB');
     }
 
@@ -353,11 +399,20 @@ Game3.StateB = function (){
     this.turn = 5;
     this.box;
     this.blank;
-    this.value;
-    this.res;
-    this.pairWithValue0=0;
+    this.value=[17,23,30];
+    this.pairWithValue0;
     this.notPairWithValue0;
     this.isEmpty;
+    this.textDefault;
+    this.textBox;
+    this.bracket;
+    this.ballRes;
+    this.textRes;
+    this.effectStart;
+    this.endStep1;
+    this.endStep2;
+    this.endGame;
+    this.result;
 };
 
 Game3.StateB.prototype = {
@@ -366,157 +421,42 @@ Game3.StateB.prototype = {
     },
 
     create: function() {
-
-        game.physics.startSystem(Phaser.Physics.ARCADE);
-        this.add.image(0, 0, "background");
-        this.stage1 = game.add.sprite(game.world.width/2 - 475,25, "stage1" );
-
-        Game3.addBackButton(this.stage1);
-        this.ball = [];
-        Game3.addTurnBar(this.turn,this.ball);
-
-        this.blank=[];
-        Game3.addBlank(this);
-
-        this.value=[17,23,30];
-        textDefault = [];
-        Game3.addTextDefault(this,textDefault);
-        this.box=[];
-        textBox=[];
-        Game3.addBox(this);
-        Game3.addTextBox(this,textBox);
-
-        if((this.value[1]+this.value[0]) % 10 === 0) {
-            this.pairWithValue0 = 1;
-            this.notPairWithValue0 = 2;
-        }
-        else {
-            this.pairWithValue0 = 2;
-            this.notPairWithValue0 = 1;
-        }
-
-        bracket = this.add.sprite(this.blank[0].x, this.blank[0].y + this.blank[0].height + 4,'bracket');
-        ballRes = this.add.sprite(bracket.x + bracket.width/2, bracket.y+60,'ballRes');
-        ballRes.anchor.set(0.5);
-        game.physics.arcade.enable(ballRes);
-        ballRes.inputEnabled = true;
-        textRes = this.game.add.text(ballRes.x, ballRes.y+5, this.value[0]+this.value[this.pairWithValue0],{font: "32px Arial", fill: "#000"});
-        textRes.anchor.set(0.5);
-        bracket.visible = false;
-        ballRes.visible = false;
-        textRes.visible = false;
-
-        this.isEmpty = [true,true,true];
-        start = true;
-        end = false;
-        end2 = false;
-        endGame = false;
-        result = '';
+        Game3.create(this);
     },
 
     update: function (){
-        if(start) {
-            for (i = 1; i < 3; i++) {
-                Game3.moveToBlank(this, i, this.stage1.x + 10 + i * 150, this.stage1.y + 75);
-            }
-            this.box[0].input.disableDrag();
-            this.game.physics.arcade.moveToXY(this.box[0], this.blank[0].x, this.blank[0].y, 100, 350);
-            if (this.isEmpty[0]) {
-                game.time.events.add(600, this.addBracket, this);
-            }
-        }
-
-        Game3.updateTextBox(this, textBox);
-        Game3.updateTextRes(ballRes,textRes);
-        if(!this.isEmpty[0] && !this.isEmpty[1] && !this.isEmpty[2]){
-            this.game.time.events.add(500, this.showOperator, this);
-        }
-
-        if(end) this.game.time.events.add(800, this.destroy2, this);
-        game.input.keyboard.addCallbacks(this, null, null, this.isTrueRes);
-
-        if(endGame) {
-            game.time.events.add(1000, this.gotoStateC, this);
-            Game3.nextTurn(this);
-        }
+        Game3.update(this);
     },
 
     addBracket:function () {
-        bracket.visible = true;
-        ballRes.visible = true;
-        textRes.visible = true;
-        this.isEmpty[0]=false;
+        Game3.addBracket(this);
     },
 
     backIfFail: function () {
-        for(i=1;i<3;i++){
-            if(i !== this.pairWithValue0) {
-                game.physics.arcade.moveToXY(this.box[i], this.stage1.x + 10+ i*(10+this.box[i-1].width), this.stage1.y + 75, 100, 100);
-            }
-        }
+        Game3.backIfFail(this);
     },
 
     showOperator: function(){
-        textDefault[1].x = textDefault[0].x+45;
-        textDefault[2].x = textDefault[1].x+110;
-        textDefault[3].x = textDefault[2].x+110;
-        textDefault[4].destroy();
-        game.time.events.add(500, this.destroyBox,this);
+        Game3.showOperator(this);
     },
 
     destroyBox: function () {
-        start = false;
-        textBox[0].destroy();
-        textBox[this.pairWithValue0].destroy();
-        this.box[0].destroy();
-        this.box[this.pairWithValue0].destroy();
-        this.blank[0].destroy();
-        this.blank[1].destroy();
-        this.blank[2].destroy();
-        bracket.destroy();
-        game.physics.arcade.moveToXY(ballRes,textDefault[3].x + 70, textDefault[3].y+23, 200, 200);
-        game.physics.arcade.moveToXY(this.box[this.notPairWithValue0],textDefault[3].x + 110, textDefault[3].y-15, 200, 200);
-        end=true;
+        Game3.destroyBox(this);
     },
 
-    destroy2: function () {
-        textRes.destroy();
-        ballRes.destroy();
-        this.box[this.notPairWithValue0].destroy();
-        game.time.events.add(100, this.addLast,this);
+    destroyToShowOperator: function () {
+        Game3.destroyToShowOperator(this);
     },
 
     addLast: function () {
-        if(!end2) {
-            game.add.text(textDefault[3].x + 60, textDefault[3].y, this.value[0] + this.value[this.pairWithValue0],{font: "48px Arial", fill: "#000"});
-            game.add.text(textDefault[3].x + 240, textDefault[3].y, '=',{font: "48px Arial", fill: "#000"});
-            game.add.image(textDefault[3].x + 280, textDefault[3].y-5, 'textBox');
-            end2 = true;
-        }
+        Game3.addLast(this);
     },
 
-    isTrueRes:function (char) {
-        if (result.length < 2) result = result + char;
-        if (result.length === 1) a1 = game.add.text(textDefault[3].x + 288, textDefault[3].y+3, result,{font: "48px Arial", fill: "#000"});
-        else if (result.length === 2) a2 = game.add.text(a1.x+30, a1.y, result.charAt(1),{font: "48px Arial", fill: "#000"});
-        trueRes = this.value[0]+this.value[1]+this.value[2];
-        if (result.length === 2 && result !== trueRes.toString()) {
-            a1.destroy();
-            a2.destroy();
-            result = '';
-        }
-        else if (result === trueRes.toString()) endGame=true;
+    inputTrueRes:function (char) {
+        Game3.inputTrueRes(char,this);
     },
 
-    nextTurn: function () {
-        if(endGame) {
-            a=this.game.time.events.add(1000, this.gotoStateB, this);
-            game.physics.arcade.moveToXY(this.ball[5], turnBar.x + turnBar.width/2 - 15, turnBar.y, 100, 200);
-
-        }
-    },
-
-    gotoStateC: function () {
+    nextState: function () {
         game.state.start('Game3_StateC');
     }
 
@@ -529,11 +469,20 @@ Game3.StateC = function (){
     this.turn = 4;
     this.box;
     this.blank;
-    this.value;
-    this.res;
-    this.pairWithValue0=0;
+    this.value=[10,12,20];
+    this.pairWithValue0;
     this.notPairWithValue0;
     this.isEmpty;
+    this.textDefault;
+    this.textBox;
+    this.bracket;
+    this.ballRes;
+    this.textRes;
+    this.effectStart;
+    this.endStep1;
+    this.endStep2;
+    this.endGame;
+    this.result;
 };
 
 Game3.StateC.prototype = {
@@ -542,157 +491,42 @@ Game3.StateC.prototype = {
     },
 
     create: function() {
-
-        game.physics.startSystem(Phaser.Physics.ARCADE);
-        this.add.image(0, 0, "background");
-        this.stage1 = game.add.sprite(game.world.width/2 - 475,25, "stage1" );
-
-        Game3.addBackButton(this.stage1);
-        this.ball = [];
-        Game3.addTurnBar(this.turn,this.ball);
-
-        this.blank=[];
-        Game3.addBlank(this);
-
-        this.value=[10,12,20];
-        textDefault = [];
-        Game3.addTextDefault(this,textDefault);
-        this.box=[];
-        textBox=[];
-        Game3.addBox(this);
-        Game3.addTextBox(this,textBox);
-
-        if((this.value[1]+this.value[0]) % 10 === 0) {
-            this.pairWithValue0 = 1;
-            this.notPairWithValue0 = 2;
-        }
-        else {
-            this.pairWithValue0 = 2;
-            this.notPairWithValue0 = 1;
-        }
-
-        bracket = this.add.sprite(this.blank[0].x, this.blank[0].y + this.blank[0].height + 4,'bracket');
-        ballRes = this.add.sprite(bracket.x + bracket.width/2, bracket.y+60,'ballRes');
-        ballRes.anchor.set(0.5);
-        game.physics.arcade.enable(ballRes);
-        ballRes.inputEnabled = true;
-        textRes = this.game.add.text(ballRes.x, ballRes.y+5, this.value[0]+this.value[this.pairWithValue0],{font: "32px Arial", fill: "#000"});
-        textRes.anchor.set(0.5);
-        bracket.visible = false;
-        ballRes.visible = false;
-        textRes.visible = false;
-
-        this.isEmpty = [true,true,true];
-        start = true;
-        end = false;
-        end2 = false;
-        endGame = false;
-        result = '';
+        Game3.create(this);
     },
 
     update: function (){
-        if(start) {
-            for (i = 1; i < 3; i++) {
-                Game3.moveToBlank(this, i, this.stage1.x + 10 + i * 150, this.stage1.y + 75);
-            }
-            this.box[0].input.disableDrag();
-            this.game.physics.arcade.moveToXY(this.box[0], this.blank[0].x, this.blank[0].y, 100, 350);
-            if (this.isEmpty[0]) {
-                game.time.events.add(600, this.addBracket, this);
-            }
-        }
-
-        Game3.updateTextBox(this, textBox);
-        Game3.updateTextRes(ballRes,textRes);
-        if(!this.isEmpty[0] && !this.isEmpty[1] && !this.isEmpty[2]){
-            this.game.time.events.add(500, this.showOperator, this);
-        }
-
-        if(end) this.game.time.events.add(800, this.destroy2, this);
-        game.input.keyboard.addCallbacks(this, null, null, this.isTrueRes);
-
-        if(endGame) {
-            game.time.events.add(1000, this.gotoStateD, this);
-            Game3.nextTurn(this);
-        }
+        Game3.update(this);
     },
 
     addBracket:function () {
-        bracket.visible = true;
-        ballRes.visible = true;
-        textRes.visible = true;
-        this.isEmpty[0]=false;
+        Game3.addBracket(this);
     },
 
     backIfFail: function () {
-        for(i=1;i<3;i++){
-            if(i !== this.pairWithValue0) {
-                game.physics.arcade.moveToXY(this.box[i], this.stage1.x + 10+ i*(10+this.box[i-1].width), this.stage1.y + 75, 100, 100);
-            }
-        }
+        Game3.backIfFail(this);
     },
 
     showOperator: function(){
-        textDefault[1].x = textDefault[0].x+45;
-        textDefault[2].x = textDefault[1].x+110;
-        textDefault[3].x = textDefault[2].x+110;
-        textDefault[4].destroy();
-        game.time.events.add(500, this.destroyBox,this);
+        Game3.showOperator(this);
     },
 
     destroyBox: function () {
-        start = false;
-        textBox[0].destroy();
-        textBox[this.pairWithValue0].destroy();
-        this.box[0].destroy();
-        this.box[this.pairWithValue0].destroy();
-        this.blank[0].destroy();
-        this.blank[1].destroy();
-        this.blank[2].destroy();
-        bracket.destroy();
-        game.physics.arcade.moveToXY(ballRes,textDefault[3].x + 70, textDefault[3].y+23, 200, 200);
-        game.physics.arcade.moveToXY(this.box[this.notPairWithValue0],textDefault[3].x + 110, textDefault[3].y-15, 200, 200);
-        end=true;
+        Game3.destroyBox(this);
     },
 
-    destroy2: function () {
-        textRes.destroy();
-        ballRes.destroy();
-        this.box[this.notPairWithValue0].destroy();
-        game.time.events.add(100, this.addLast,this);
+    destroyToShowOperator: function () {
+        Game3.destroyToShowOperator(this);
     },
 
     addLast: function () {
-        if(!end2) {
-            game.add.text(textDefault[3].x + 60, textDefault[3].y, this.value[0] + this.value[this.pairWithValue0],{font: "48px Arial", fill: "#000"});
-            game.add.text(textDefault[3].x + 240, textDefault[3].y, '=',{font: "48px Arial", fill: "#000"});
-            game.add.image(textDefault[3].x + 280, textDefault[3].y-5, 'textBox');
-            end2 = true;
-        }
+        Game3.addLast(this);
     },
 
-    isTrueRes:function (char) {
-        if (result.length < 2) result = result + char;
-        if (result.length === 1) a1 = game.add.text(textDefault[3].x + 288, textDefault[3].y+3, result,{font: "48px Arial", fill: "#000"});
-        else if (result.length === 2) a2 = game.add.text(a1.x+30, a1.y, result.charAt(1),{font: "48px Arial", fill: "#000"});
-        trueRes = this.value[0]+this.value[1]+this.value[2];
-        if (result.length === 2 && result !== trueRes.toString()) {
-            a1.destroy();
-            a2.destroy();
-            result = '';
-        }
-        else if (result === trueRes.toString()) endGame=true;
+    inputTrueRes:function (char) {
+        Game3.inputTrueRes(char,this);
     },
 
-    nextTurn: function () {
-        if(endGame) {
-            a=this.game.time.events.add(1000, this.gotoStateB, this);
-            game.physics.arcade.moveToXY(this.ball[5], turnBar.x + turnBar.width/2 - 15, turnBar.y, 100, 200);
-
-        }
-    },
-
-    gotoStateD: function () {
+    nextState: function () {
         game.state.start('Game3_StateD');
     }
 
@@ -705,11 +539,20 @@ Game3.StateD = function (){
     this.turn = 3;
     this.box;
     this.blank;
-    this.value;
-    this.res;
-    this.pairWithValue0=0;
+    this.value=[13,15,17];
+    this.pairWithValue0;
     this.notPairWithValue0;
     this.isEmpty;
+    this.textDefault;
+    this.textBox;
+    this.bracket;
+    this.ballRes;
+    this.textRes;
+    this.effectStart;
+    this.endStep1;
+    this.endStep2;
+    this.endGame;
+    this.result;
 };
 
 Game3.StateD.prototype = {
@@ -718,160 +561,44 @@ Game3.StateD.prototype = {
     },
 
     create: function() {
-
-        game.physics.startSystem(Phaser.Physics.ARCADE);
-        this.add.image(0, 0, "background");
-        this.stage1 = game.add.sprite(game.world.width/2 - 475,25, "stage1" );
-
-        Game3.addBackButton(this.stage1);
-        this.ball = [];
-        Game3.addTurnBar(this.turn,this.ball);
-
-        this.blank=[];
-        Game3.addBlank(this);
-
-        this.value=[13,15,17];
-        textDefault = [];
-        Game3.addTextDefault(this,textDefault);
-        this.box=[];
-        textBox=[];
-        Game3.addBox(this);
-        Game3.addTextBox(this,textBox);
-
-        if((this.value[1]+this.value[0]) % 10 === 0) {
-            this.pairWithValue0 = 1;
-            this.notPairWithValue0 = 2;
-        }
-        else {
-            this.pairWithValue0 = 2;
-            this.notPairWithValue0 = 1;
-        }
-
-        bracket = this.add.sprite(this.blank[0].x, this.blank[0].y + this.blank[0].height + 4,'bracket');
-        ballRes = this.add.sprite(bracket.x + bracket.width/2, bracket.y+60,'ballRes');
-        ballRes.anchor.set(0.5);
-        game.physics.arcade.enable(ballRes);
-        ballRes.inputEnabled = true;
-        textRes = this.game.add.text(ballRes.x, ballRes.y+5, this.value[0]+this.value[this.pairWithValue0],{font: "32px Arial", fill: "#000"});
-        textRes.anchor.set(0.5);
-        bracket.visible = false;
-        ballRes.visible = false;
-        textRes.visible = false;
-
-        this.isEmpty = [true,true,true];
-        start = true;
-        end = false;
-        end2 = false;
-        endGame = false;
-        result = '';
+        Game3.create(this);
     },
 
     update: function (){
-        if(start) {
-            for (i = 1; i < 3; i++) {
-                Game3.moveToBlank(this, i, this.stage1.x + 10 + i * 150, this.stage1.y + 75);
-            }
-            this.box[0].input.disableDrag();
-            this.game.physics.arcade.moveToXY(this.box[0], this.blank[0].x, this.blank[0].y, 100, 350);
-            if (this.isEmpty[0]) {
-                game.time.events.add(600, this.addBracket, this);
-            }
-        }
-
-        Game3.updateTextBox(this, textBox);
-        Game3.updateTextRes(ballRes,textRes);
-        if(!this.isEmpty[0] && !this.isEmpty[1] && !this.isEmpty[2]){
-            this.game.time.events.add(500, this.showOperator, this);
-        }
-
-        if(end) this.game.time.events.add(800, this.destroy2, this);
-        game.input.keyboard.addCallbacks(this, null, null, this.isTrueRes);
-
-        if(endGame) {
-            game.time.events.add(1000, this.gotoStateE, this);
-            Game3.nextTurn(this);
-        }
+        Game3.update(this);
     },
 
     addBracket:function () {
-        bracket.visible = true;
-        ballRes.visible = true;
-        textRes.visible = true;
-        this.isEmpty[0]=false;
+        Game3.addBracket(this);
     },
 
     backIfFail: function () {
-        for(i=1;i<3;i++){
-            if(i !== this.pairWithValue0) {
-                game.physics.arcade.moveToXY(this.box[i], this.stage1.x + 10+ i*(10+this.box[i-1].width), this.stage1.y + 75, 100, 100);
-            }
-        }
+        Game3.backIfFail(this);
     },
 
     showOperator: function(){
-        textDefault[1].x = textDefault[0].x+45;
-        textDefault[2].x = textDefault[1].x+110;
-        textDefault[3].x = textDefault[2].x+110;
-        textDefault[4].destroy();
-        game.time.events.add(500, this.destroyBox,this);
+        Game3.showOperator(this);
     },
 
     destroyBox: function () {
-        start = false;
-        textBox[0].destroy();
-        textBox[this.pairWithValue0].destroy();
-        this.box[0].destroy();
-        this.box[this.pairWithValue0].destroy();
-        this.blank[0].destroy();
-        this.blank[1].destroy();
-        this.blank[2].destroy();
-        bracket.destroy();
-        game.physics.arcade.moveToXY(ballRes,textDefault[3].x + 70, textDefault[3].y+23, 200, 200);
-        game.physics.arcade.moveToXY(this.box[this.notPairWithValue0],textDefault[3].x + 110, textDefault[3].y-15, 200, 200);
-        end=true;
+        Game3.destroyBox(this);
     },
 
-    destroy2: function () {
-        textRes.destroy();
-        ballRes.destroy();
-        this.box[this.notPairWithValue0].destroy();
-        game.time.events.add(100, this.addLast,this);
+    destroyToShowOperator: function () {
+        Game3.destroyToShowOperator(this);
     },
 
     addLast: function () {
-        if(!end2) {
-            game.add.text(textDefault[3].x + 60, textDefault[3].y, this.value[0] + this.value[this.pairWithValue0],{font: "48px Arial", fill: "#000"});
-            game.add.text(textDefault[3].x + 240, textDefault[3].y, '=',{font: "48px Arial", fill: "#000"});
-            game.add.image(textDefault[3].x + 280, textDefault[3].y-5, 'textBox');
-            end2 = true;
-        }
+        Game3.addLast(this);
     },
 
-    isTrueRes:function (char) {
-        if (result.length < 2) result = result + char;
-        if (result.length === 1) a1 = game.add.text(textDefault[3].x + 288, textDefault[3].y+3, result,{font: "48px Arial", fill: "#000"});
-        else if (result.length === 2) a2 = game.add.text(a1.x+30, a1.y, result.charAt(1),{font: "48px Arial", fill: "#000"});
-        trueRes = this.value[0]+this.value[1]+this.value[2];
-        if (result.length === 2 && result !== trueRes.toString()) {
-            a1.destroy();
-            a2.destroy();
-            result = '';
-        }
-        else if (result === trueRes.toString()) endGame=true;
+    inputTrueRes:function (char) {
+        Game3.inputTrueRes(char,this);
     },
 
-    nextTurn: function () {
-        if(endGame) {
-            a=this.game.time.events.add(1000, this.gotoStateB, this);
-            game.physics.arcade.moveToXY(this.ball[5], turnBar.x + turnBar.width/2 - 15, turnBar.y, 100, 200);
-
-        }
-    },
-
-    gotoStateE: function () {
+    nextState: function () {
         game.state.start('Game3_StateE');
     }
-
 };
 
 
@@ -881,11 +608,20 @@ Game3.StateE = function (){
     this.turn = 2;
     this.box;
     this.blank;
-    this.value;
-    this.res;
-    this.pairWithValue0=0;
+    this.value=[15,24,35];
+    this.pairWithValue0;
     this.notPairWithValue0;
     this.isEmpty;
+    this.textDefault;
+    this.textBox;
+    this.bracket;
+    this.ballRes;
+    this.textRes;
+    this.effectStart;
+    this.endStep1;
+    this.endStep2;
+    this.endGame;
+    this.result;
 };
 
 Game3.StateE.prototype = {
@@ -894,160 +630,44 @@ Game3.StateE.prototype = {
     },
 
     create: function() {
-
-        game.physics.startSystem(Phaser.Physics.ARCADE);
-        this.add.image(0, 0, "background");
-        this.stage1 = game.add.sprite(game.world.width/2 - 475,25, "stage1" );
-
-        Game3.addBackButton(this.stage1);
-        this.ball = [];
-        Game3.addTurnBar(this.turn,this.ball);
-
-        this.blank=[];
-        Game3.addBlank(this);
-
-        this.value=[15,24,35];
-        textDefault = [];
-        Game3.addTextDefault(this,textDefault);
-        this.box=[];
-        textBox=[];
-        Game3.addBox(this);
-        Game3.addTextBox(this,textBox);
-
-        if((this.value[1]+this.value[0]) % 10 === 0) {
-            this.pairWithValue0 = 1;
-            this.notPairWithValue0 = 2;
-        }
-        else {
-            this.pairWithValue0 = 2;
-            this.notPairWithValue0 = 1;
-        }
-
-        bracket = this.add.sprite(this.blank[0].x, this.blank[0].y + this.blank[0].height + 4,'bracket');
-        ballRes = this.add.sprite(bracket.x + bracket.width/2, bracket.y+60,'ballRes');
-        ballRes.anchor.set(0.5);
-        game.physics.arcade.enable(ballRes);
-        ballRes.inputEnabled = true;
-        textRes = this.game.add.text(ballRes.x, ballRes.y+5, this.value[0]+this.value[this.pairWithValue0],{font: "32px Arial", fill: "#000"});
-        textRes.anchor.set(0.5);
-        bracket.visible = false;
-        ballRes.visible = false;
-        textRes.visible = false;
-
-        this.isEmpty = [true,true,true];
-        start = true;
-        end = false;
-        end2 = false;
-        endGame = false;
-        result = '';
+        Game3.create(this);
     },
 
     update: function (){
-        if(start) {
-            for (i = 1; i < 3; i++) {
-                Game3.moveToBlank(this, i, this.stage1.x + 10 + i * 150, this.stage1.y + 75);
-            }
-            this.box[0].input.disableDrag();
-            this.game.physics.arcade.moveToXY(this.box[0], this.blank[0].x, this.blank[0].y, 100, 350);
-            if (this.isEmpty[0]) {
-                game.time.events.add(600, this.addBracket, this);
-            }
-        }
-
-        Game3.updateTextBox(this, textBox);
-        Game3.updateTextRes(ballRes,textRes);
-        if(!this.isEmpty[0] && !this.isEmpty[1] && !this.isEmpty[2]){
-            this.game.time.events.add(500, this.showOperator, this);
-        }
-
-        if(end) this.game.time.events.add(800, this.destroy2, this);
-        game.input.keyboard.addCallbacks(this, null, null, this.isTrueRes);
-
-        if(endGame) {
-            game.time.events.add(1000, this.gotoStateF, this);
-            Game3.nextTurn(this);
-        }
+        Game3.update(this);
     },
 
     addBracket:function () {
-        bracket.visible = true;
-        ballRes.visible = true;
-        textRes.visible = true;
-        this.isEmpty[0]=false;
+        Game3.addBracket(this);
     },
 
     backIfFail: function () {
-        for(i=1;i<3;i++){
-            if(i !== this.pairWithValue0) {
-                game.physics.arcade.moveToXY(this.box[i], this.stage1.x + 10+ i*(10+this.box[i-1].width), this.stage1.y + 75, 100, 100);
-            }
-        }
+        Game3.backIfFail(this);
     },
 
     showOperator: function(){
-        textDefault[1].x = textDefault[0].x+45;
-        textDefault[2].x = textDefault[1].x+110;
-        textDefault[3].x = textDefault[2].x+110;
-        textDefault[4].destroy();
-        game.time.events.add(500, this.destroyBox,this);
+        Game3.showOperator(this);
     },
 
     destroyBox: function () {
-        start = false;
-        textBox[0].destroy();
-        textBox[this.pairWithValue0].destroy();
-        this.box[0].destroy();
-        this.box[this.pairWithValue0].destroy();
-        this.blank[0].destroy();
-        this.blank[1].destroy();
-        this.blank[2].destroy();
-        bracket.destroy();
-        game.physics.arcade.moveToXY(ballRes,textDefault[3].x + 70, textDefault[3].y+23, 200, 200);
-        game.physics.arcade.moveToXY(this.box[this.notPairWithValue0],textDefault[3].x + 110, textDefault[3].y-15, 200, 200);
-        end=true;
+        Game3.destroyBox(this);
     },
 
-    destroy2: function () {
-        textRes.destroy();
-        ballRes.destroy();
-        this.box[this.notPairWithValue0].destroy();
-        game.time.events.add(100, this.addLast,this);
+    destroyToShowOperator: function () {
+        Game3.destroyToShowOperator(this);
     },
 
     addLast: function () {
-        if(!end2) {
-            game.add.text(textDefault[3].x + 60, textDefault[3].y, this.value[0] + this.value[this.pairWithValue0],{font: "48px Arial", fill: "#000"});
-            game.add.text(textDefault[3].x + 240, textDefault[3].y, '=',{font: "48px Arial", fill: "#000"});
-            game.add.image(textDefault[3].x + 280, textDefault[3].y-5, 'textBox');
-            end2 = true;
-        }
+        Game3.addLast(this);
     },
 
-    isTrueRes:function (char) {
-        if (result.length < 2) result = result + char;
-        if (result.length === 1) a1 = game.add.text(textDefault[3].x + 288, textDefault[3].y+3, result,{font: "48px Arial", fill: "#000"});
-        else if (result.length === 2) a2 = game.add.text(a1.x+30, a1.y, result.charAt(1),{font: "48px Arial", fill: "#000"});
-        trueRes = this.value[0]+this.value[1]+this.value[2];
-        if (result.length === 2 && result !== trueRes.toString()) {
-            a1.destroy();
-            a2.destroy();
-            result = '';
-        }
-        else if (result === trueRes.toString()) endGame=true;
+    inputTrueRes:function (char) {
+        Game3.inputTrueRes(char,this);
     },
 
-    nextTurn: function () {
-        if(endGame) {
-            a=this.game.time.events.add(1000, this.gotoStateB, this);
-            game.physics.arcade.moveToXY(this.ball[5], turnBar.x + turnBar.width/2 - 15, turnBar.y, 100, 200);
-
-        }
-    },
-
-    gotoStateF: function () {
+    nextState: function () {
         game.state.start('Game3_StateF');
     }
-
 };
 
 
@@ -1057,11 +677,20 @@ Game3.StateF = function (){
     this.turn = 1;
     this.box;
     this.blank;
-    this.value;
-    this.res;
-    this.pairWithValue0=0;
+    this.value=[2,30,28];
+    this.pairWithValue0;
     this.notPairWithValue0;
     this.isEmpty;
+    this.textDefault;
+    this.textBox;
+    this.bracket;
+    this.ballRes;
+    this.textRes;
+    this.effectStart;
+    this.endStep1;
+    this.endStep2;
+    this.endGame;
+    this.result;
 };
 
 Game3.StateF.prototype = {
@@ -1070,158 +699,42 @@ Game3.StateF.prototype = {
     },
 
     create: function() {
-
-        game.physics.startSystem(Phaser.Physics.ARCADE);
-        this.add.image(0, 0, "background");
-        this.stage1 = game.add.sprite(game.world.width/2 - 475,25, "stage1" );
-
-        Game3.addBackButton(this.stage1);
-        this.ball = [];
-        Game3.addTurnBar(this.turn,this.ball);
-
-        this.blank=[];
-        Game3.addBlank(this);
-
-        this.value=[2,30,28];
-        textDefault = [];
-        Game3.addTextDefault(this,textDefault);
-        this.box=[];
-        textBox=[];
-        Game3.addBox(this);
-        Game3.addTextBox(this,textBox);
-
-        if((this.value[1]+this.value[0]) % 10 === 0) {
-            this.pairWithValue0 = 1;
-            this.notPairWithValue0 = 2;
-        }
-        else {
-            this.pairWithValue0 = 2;
-            this.notPairWithValue0 = 1;
-        }
-
-        bracket = this.add.sprite(this.blank[0].x, this.blank[0].y + this.blank[0].height + 4,'bracket');
-        ballRes = this.add.sprite(bracket.x + bracket.width/2, bracket.y+60,'ballRes');
-        ballRes.anchor.set(0.5);
-        game.physics.arcade.enable(ballRes);
-        ballRes.inputEnabled = true;
-        textRes = this.game.add.text(ballRes.x, ballRes.y+5, this.value[0]+this.value[this.pairWithValue0],{font: "32px Arial", fill: "#000"});
-        textRes.anchor.set(0.5);
-        bracket.visible = false;
-        ballRes.visible = false;
-        textRes.visible = false;
-
-        this.isEmpty = [true,true,true];
-        start = true;
-        end = false;
-        end2 = false;
-        endGame = false;
-        result = '';
+        Game3.create(this);
     },
 
     update: function (){
-        if(start) {
-            for (i = 1; i < 3; i++) {
-                Game3.moveToBlank(this, i, this.stage1.x + 10 + i * 150, this.stage1.y + 75);
-            }
-            this.box[0].input.disableDrag();
-            this.game.physics.arcade.moveToXY(this.box[0], this.blank[0].x, this.blank[0].y, 100, 350);
-            if (this.isEmpty[0]) {
-                game.time.events.add(600, this.addBracket, this);
-            }
-        }
-
-        Game3.updateTextBox(this, textBox);
-        Game3.updateTextRes(ballRes,textRes);
-        if(!this.isEmpty[0] && !this.isEmpty[1] && !this.isEmpty[2]){
-            this.game.time.events.add(500, this.showOperator, this);
-        }
-
-        if(end) this.game.time.events.add(800, this.destroy2, this);
-        game.input.keyboard.addCallbacks(this, null, null, this.isTrueRes);
-
-        if(endGame) {
-            game.time.events.add(1000, this.winGame, this);
-            Game3.nextTurn(this);
-        }
+        Game3.update(this);
     },
 
     addBracket:function () {
-        bracket.visible = true;
-        ballRes.visible = true;
-        textRes.visible = true;
-        this.isEmpty[0]=false;
+        Game3.addBracket(this);
     },
 
     backIfFail: function () {
-        for(i=1;i<3;i++){
-            if(i !== this.pairWithValue0) {
-                game.physics.arcade.moveToXY(this.box[i], this.stage1.x + 10+ i*(10+this.box[i-1].width), this.stage1.y + 75, 100, 100);
-            }
-        }
+        Game3.backIfFail(this);
     },
 
     showOperator: function(){
-        textDefault[1].x = textDefault[0].x+45;
-        textDefault[2].x = textDefault[1].x+110;
-        textDefault[3].x = textDefault[2].x+110;
-        textDefault[4].destroy();
-        game.time.events.add(500, this.destroyBox,this);
+        Game3.showOperator(this);
     },
 
     destroyBox: function () {
-        start = false;
-        textBox[0].destroy();
-        textBox[this.pairWithValue0].destroy();
-        this.box[0].destroy();
-        this.box[this.pairWithValue0].destroy();
-        this.blank[0].destroy();
-        this.blank[1].destroy();
-        this.blank[2].destroy();
-        bracket.destroy();
-        game.physics.arcade.moveToXY(ballRes,textDefault[3].x + 70, textDefault[3].y+23, 200, 200);
-        game.physics.arcade.moveToXY(this.box[this.notPairWithValue0],textDefault[3].x + 110, textDefault[3].y-15, 200, 200);
-        end=true;
+        Game3.destroyBox(this);
     },
 
-    destroy2: function () {
-        textRes.destroy();
-        ballRes.destroy();
-        this.box[this.notPairWithValue0].destroy();
-        game.time.events.add(100, this.addLast,this);
+    destroyToShowOperator: function () {
+        Game3.destroyToShowOperator(this);
     },
 
     addLast: function () {
-        if(!end2) {
-            game.add.text(textDefault[3].x + 60, textDefault[3].y, this.value[0] + this.value[this.pairWithValue0],{font: "48px Arial", fill: "#000"});
-            game.add.text(textDefault[3].x + 240, textDefault[3].y, '=',{font: "48px Arial", fill: "#000"});
-            game.add.image(textDefault[3].x + 280, textDefault[3].y-5, 'textBox');
-            end2 = true;
-        }
+        Game3.addLast(this);
     },
 
-    isTrueRes:function (char) {
-        if (result.length < 2) result = result + char;
-        if (result.length === 1) a1 = game.add.text(textDefault[3].x + 288, textDefault[3].y+3, result,{font: "48px Arial", fill: "#000"});
-        else if (result.length === 2) a2 = game.add.text(a1.x+30, a1.y, result.charAt(1),{font: "48px Arial", fill: "#000"});
-        trueRes = this.value[0]+this.value[1]+this.value[2];
-        if (result.length === 2 && result !== trueRes.toString()) {
-            a1.destroy();
-            a2.destroy();
-            result = '';
-        }
-        else if (result === trueRes.toString()) endGame=true;
+    inputTrueRes:function (char) {
+        Game3.inputTrueRes(char,this);
     },
 
-    nextTurn: function () {
-        if(endGame) {
-            a=this.game.time.events.add(1000, this.gotoStateB, this);
-            game.physics.arcade.moveToXY(this.ball[5], turnBar.x + turnBar.width/2 - 15, turnBar.y, 100, 200);
-
-        }
-    },
-
-    winGame: function () {
-        game.state.start("Congratulation");
+    nextState: function () {
+        game.state.start('Congratulation');
     }
-
 };
