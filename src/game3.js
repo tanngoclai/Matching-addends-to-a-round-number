@@ -1,6 +1,6 @@
-var Game3 = {
-    preload: function () {
-        game.load.image("background", "assets/background.png");
+let Game3 = {
+    preload: function() {
+
         game.load.image("stage1", "assets/stage1.png");
         game.load.image("turnBall", "assets/turnBall.png");
         game.load.image("turnBar", "assets/turnBar.png");
@@ -10,10 +10,10 @@ var Game3 = {
         game.load.image("textBox", "assets/textBox3.png");
     },
 
-    create: function (state) {
+    create: function(state) {
 
         game.physics.startSystem(Phaser.Physics.ARCADE);
-        state.add.image(0, 0, "background");
+
         state.stage1 = game.add.sprite(game.world.width / 2 - 475, 25, "stage1");
 
         state.ball = [];
@@ -65,7 +65,7 @@ var Game3 = {
         state.result = '';
     },
 
-    update: function (state) {
+    update: function(state) {
         //Hieu ung khi bat dau game
         if (state.effectStart) {
             for (i = 1; i < 3; i++) {
@@ -103,11 +103,11 @@ var Game3 = {
         }
     },
 
-    back: function () {
+    back: function() {
         game.state.start("Start");
     },
 
-    addBackButton: function (state) {
+    addBackButton: function(state) {
         backButton = game.add.text(state.stage1.x + 5, state.stage1.y + 7, "<", {
             font: "40px Arial",
             fill: " #00BFFF",
@@ -124,7 +124,7 @@ var Game3 = {
         backButton2.events.onInputUp.add(Game3.back);
     },
 
-    addTurnBar: function (state) {
+    addTurnBar: function(state) {
 
         turnBar = game.add.image(game.world.width / 2, 50, "turnBar");
         turnBar.anchor.set(0.5);
@@ -143,7 +143,7 @@ var Game3 = {
         }
     },
 
-    addBox: function (state) {
+    addBox: function(state) {
         bounds = new Phaser.Rectangle(game.world.width / 2 - 450, 80, 900, 580);
         for (i = 0; i < 3; i++) {
             if (i > 0) {
@@ -160,7 +160,7 @@ var Game3 = {
         }
     },
 
-    addBlank: function (state) {
+    addBlank: function(state) {
         for (i = 0; i < 3; i++) {
             if (i > 0) {
                 newBlank = game.add.sprite(state.blank[0].x + i * (15 + state.blank[i - 1].width), state.blank[i - 1].y, "box");
@@ -172,8 +172,8 @@ var Game3 = {
         }
     },
 
-    addTextDefault: function (state) {
-        style = {font: "48px Arial", fill: "#000"};
+    addTextDefault: function(state) {
+        style = { font: "48px Arial", fill: "#000" };
         for (i = 0; i < 3; i++) {
             if (i > 0) {
                 newText = game.add.text(state.stage1.x + 20 + i * 150, state.stage1.y + 88, "+ " + state.value[i].toString(), style);
@@ -188,8 +188,8 @@ var Game3 = {
         state.textDefault.push(questionMark);
     },
 
-    addTextBox: function (state) {
-        style = {font: "48px Arial", fill: "#000"};
+    addTextBox: function(state) {
+        style = { font: "48px Arial", fill: "#000" };
         for (i = 0; i < 3; i++) {
             if (i > 0) {
                 newText = game.add.text(100, 100, '+ ' + state.value[i].toString(), style);
@@ -201,26 +201,26 @@ var Game3 = {
         }
     },
 
-    addBracket: function () {
+    addBracket: function() {
         this.bracket.visible = true;
         this.ballRes.visible = true;
         this.textRes.visible = true;
         this.isEmpty[0] = false;
     },
 
-    updateTextBox: function (state) {
+    updateTextBox: function(state) {
         for (i = 0; i < 3; i++) {
             state.textBox[i].x = Math.floor(state.box[i].x + state.box[i].width / 2);
             state.textBox[i].y = Math.floor(state.box[i].y + state.box[i].height / 2 + 8);
         }
     },
 
-    updateTextRes: function (state) {
+    updateTextRes: function(state) {
         state.textRes.x = Math.floor(state.ballRes.x);
         state.textRes.y = Math.floor(state.ballRes.y + 5);
     },
 
-    moveToBlank: function (state, i, x, y) {
+    moveToBlank: function(state, i, x, y) {
         if (game.input.mousePointer.isDown) {
             state.box[i].body.velocity.setTo(0, 0);
         } else {
@@ -249,14 +249,14 @@ var Game3 = {
         }
     },
 
-    isAroundBlank: function (state, i, j) {
-        return state.box[i].x > state.blank[j].x - state.blank[j].width
-            && state.box[i].x < state.blank[j].x + state.blank[j].width
-            && state.box[i].y > state.blank[j].y - state.blank[j].height
-            && state.box[i].x < state.blank[j].x + state.blank[j].height;
+    isAroundBlank: function(state, i, j) {
+        return state.box[i].x > state.blank[j].x - state.blank[j].width &&
+            state.box[i].x < state.blank[j].x + state.blank[j].width &&
+            state.box[i].y > state.blank[j].y - state.blank[j].height &&
+            state.box[i].x < state.blank[j].x + state.blank[j].height;
     },
 
-    backIfFail: function () {
+    backIfFail: function() {
         for (i = 1; i < 3; i++) {
             if (i !== this.pairWithValue0) {
                 game.physics.arcade.moveToXY(this.box[i], this.stage1.x + 10 + i * (10 + this.box[i - 1].width), this.stage1.y + 75, 100, 100);
@@ -264,7 +264,7 @@ var Game3 = {
         }
     },
 
-    showOperator: function () {
+    showOperator: function() {
         this.textDefault[1].x = this.textDefault[0].x + 60;
         this.textDefault[2].x = this.textDefault[1].x + 110;
         this.textDefault[3].x = this.textDefault[2].x + 110;
@@ -272,7 +272,7 @@ var Game3 = {
         game.time.events.add(500, Game3.destroyBox, this);
     },
 
-    destroyBox: function () {
+    destroyBox: function() {
         this.effectStart = false;
         this.textBox[0].destroy();
         this.textBox[this.pairWithValue0].destroy();
@@ -287,30 +287,30 @@ var Game3 = {
         this.endStep1 = true;
     },
 
-    destroyToShowOperator: function () {
+    destroyToShowOperator: function() {
         this.textRes.destroy();
         this.ballRes.destroy();
         this.box[this.notPairWithValue0].destroy();
         game.time.events.add(100, Game3.addLast, this);
     },
 
-    addLast: function () {
+    addLast: function() {
         if (!this.endStep2) {
             game.add.text(this.textDefault[3].x + 60, this.textDefault[3].y, this.value[0] + this.value[this.pairWithValue0], {
                 font: "48px Arial",
                 fill: "#000"
             });
-            game.add.text(this.textDefault[3].x + 240, this.textDefault[3].y, '=', {font: "48px Arial", fill: "#000"});
+            game.add.text(this.textDefault[3].x + 240, this.textDefault[3].y, '=', { font: "48px Arial", fill: "#000" });
             game.add.image(this.textDefault[3].x + 280, this.textDefault[3].y - 5, 'textBox');
             this.endStep2 = true;
         }
     },
 
-    inputRes: function (char) {
+    inputRes: function(char) {
         Game3.inputTrueRes(char, this);
     },
 
-    inputTrueRes: function (char, state) {
+    inputTrueRes: function(char, state) {
         if (state.result.length < 2) state.result = state.result + char;
         if (state.result.length === 1) a1 = game.add.text(state.textDefault[3].x + 288, state.textDefault[3].y + 3, state.result, {
             font: "48px Arial",
@@ -328,55 +328,55 @@ var Game3 = {
         } else if (state.result === trueRes.toString()) state.endGame = true;
     },
 
-    nextTurn: function (state) {
+    nextTurn: function(state) {
         game.physics.arcade.moveToXY(state.ball[state.turn - 1], turnBar.x + turnBar.width / 2 - 15 - 23 * (6 - state.turn), turnBar.y, 100, 200);
     }
 };
 
 
-Game3.StateA = function () {
+Game3.StateA = function() {
     this.stage1;
-    this.ball;//Bong dem luot choi
+    this.ball; //Bong dem luot choi
     this.turn = 6;
-    this.box;//Hop chua gia tri la so, co the di chuyen duoc
-    this.blank;//Vi tri de dat cac hop chua gia tri la so (this.box)
+    this.box; //Hop chua gia tri la so, co the di chuyen duoc
+    this.blank; //Vi tri de dat cac hop chua gia tri la so (this.box)
     this.value = [6, 68, 24];
-    this.pairWithValue0;//So thu tu cua hop mang gia tri de ghep voi gia tri thu nhat tao thanh so tron (round number)
-    this.notPairWithValue0;//So thu tu cua hop mang gia tri ghep voi gia tri thu nhat khong tao thanh so tron (round number)
-    this.isEmpty;//Kiem tra cac vi tri dat cac hop (this.blank) co trong hay khong
-    this.textDefault;//Cac gia tri o hang thu nhat, nam co dinh, chi nhin thay khi di chuyen cac hop ra ngoai
-    this.textBox;//Hien thi cac so trong moi hop
-    this.bracket;//Hien thi hoac an dau ngoac nhon
-    this.ballRes;//Hinh tron nho chua gia tri, nam duoi dau ngoac ngon
-    this.textRes;//Hien thi gia tri trong hinh tron o tren (this.ballRes)
-    this.effectStart;//Kiem tra hieu ung khi bat dau tro choi da hoat dong hay chua
-    this.endStep1;//Kiem tra ket thuc thao tac thu nhat hay chua (Thao tac 1: tu dau den khi ghep dung cac hop vao vi tri thich hop)
-    this.endStep2;//Kiem tra ket thuc thao tac 2 hay chua (Thao tac 2: tu ket thuc thao tac 1 den khi hien thi xong phep tinh)
-    this.endGame;//Kiem tra dieu kien ket thuc luot choi (dieu kien dung = nhap dung ket qua)
-    this.result;//Hien tri ket qua nhap tu ban phim
+    this.pairWithValue0; //So thu tu cua hop mang gia tri de ghep voi gia tri thu nhat tao thanh so tron (round number)
+    this.notPairWithValue0; //So thu tu cua hop mang gia tri ghep voi gia tri thu nhat khong tao thanh so tron (round number)
+    this.isEmpty; //Kiem tra cac vi tri dat cac hop (this.blank) co trong hay khong
+    this.textDefault; //Cac gia tri o hang thu nhat, nam co dinh, chi nhin thay khi di chuyen cac hop ra ngoai
+    this.textBox; //Hien thi cac so trong moi hop
+    this.bracket; //Hien thi hoac an dau ngoac nhon
+    this.ballRes; //Hinh tron nho chua gia tri, nam duoi dau ngoac ngon
+    this.textRes; //Hien thi gia tri trong hinh tron o tren (this.ballRes)
+    this.effectStart; //Kiem tra hieu ung khi bat dau tro choi da hoat dong hay chua
+    this.endStep1; //Kiem tra ket thuc thao tac thu nhat hay chua (Thao tac 1: tu dau den khi ghep dung cac hop vao vi tri thich hop)
+    this.endStep2; //Kiem tra ket thuc thao tac 2 hay chua (Thao tac 2: tu ket thuc thao tac 1 den khi hien thi xong phep tinh)
+    this.endGame; //Kiem tra dieu kien ket thuc luot choi (dieu kien dung = nhap dung ket qua)
+    this.result; //Hien tri ket qua nhap tu ban phim
 };
 
 Game3.StateA.prototype = {
-    preload: function () {
+    preload: function() {
         Game3.preload();
     },
 
-    create: function () {
+    create: function() {
         Game3.create(this);
     },
 
-    update: function () {
+    update: function() {
         Game3.update(this);
     },
 
-    nextState: function () {
+    nextState: function() {
         game.state.start('Game3_StateB');
     }
 
 };
 
 
-Game3.StateB = function () {
+Game3.StateB = function() {
     //Xem chu thich cac bien o StateA
     this.stage1;
     this.ball;
@@ -400,26 +400,26 @@ Game3.StateB = function () {
 };
 
 Game3.StateB.prototype = {
-    preload: function () {
+    preload: function() {
         Game3.preload();
     },
 
-    create: function () {
+    create: function() {
         Game3.create(this);
     },
 
-    update: function () {
+    update: function() {
         Game3.update(this);
     },
 
-    nextState: function () {
+    nextState: function() {
         game.state.start('Game3_StateC');
     }
 
 };
 
 
-Game3.StateC = function () {
+Game3.StateC = function() {
     //Xem chu thich cac bien o StateA
     this.stage1;
     this.ball;
@@ -443,26 +443,26 @@ Game3.StateC = function () {
 };
 
 Game3.StateC.prototype = {
-    preload: function () {
+    preload: function() {
         Game3.preload();
     },
 
-    create: function () {
+    create: function() {
         Game3.create(this);
     },
 
-    update: function () {
+    update: function() {
         Game3.update(this);
     },
 
-    nextState: function () {
+    nextState: function() {
         game.state.start('Game3_StateD');
     }
 
 };
 
 
-Game3.StateD = function () {
+Game3.StateD = function() {
     //Xem chu thich cac bien o StateA
     this.stage1;
     this.ball;
@@ -486,25 +486,25 @@ Game3.StateD = function () {
 };
 
 Game3.StateD.prototype = {
-    preload: function () {
+    preload: function() {
         Game3.preload();
     },
 
-    create: function () {
+    create: function() {
         Game3.create(this);
     },
 
-    update: function () {
+    update: function() {
         Game3.update(this);
     },
 
-    nextState: function () {
+    nextState: function() {
         game.state.start('Game3_StateE');
     }
 };
 
 
-Game3.StateE = function () {
+Game3.StateE = function() {
     //Xem chu thich cac bien o StateA
     this.stage1;
     this.ball;
@@ -528,25 +528,25 @@ Game3.StateE = function () {
 };
 
 Game3.StateE.prototype = {
-    preload: function () {
+    preload: function() {
         Game3.preload();
     },
 
-    create: function () {
+    create: function() {
         Game3.create(this);
     },
 
-    update: function () {
+    update: function() {
         Game3.update(this);
     },
 
-    nextState: function () {
+    nextState: function() {
         game.state.start('Game3_StateF');
     }
 };
 
 
-Game3.StateF = function () {
+Game3.StateF = function() {
     //Xem chu thich cac bien o StateA
     this.stage1;
     this.ball;
@@ -570,19 +570,19 @@ Game3.StateF = function () {
 };
 
 Game3.StateF.prototype = {
-    preload: function () {
+    preload: function() {
         Game3.preload();
     },
 
-    create: function () {
+    create: function() {
         Game3.create(this);
     },
 
-    update: function () {
+    update: function() {
         Game3.update(this);
     },
 
-    nextState: function () {
+    nextState: function() {
         game.state.start('Congratulation');
     }
 };

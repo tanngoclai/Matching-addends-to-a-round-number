@@ -1,16 +1,41 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Round Number - Team 27</title>
+    <script type="text/javascript" src="phaser.min.js"></script>
+    <script type="text/javascript" src="src/congratulation.js"></script>
+    <script type="text/javascript" src="src/start.js"></script>
+    <script type="text/javascript" src="src/game1.js"></script>
+    <script type="text/javascript" src="src/game2.js"></script>
+    <script type="text/javascript" src="src/game3.js"></script>
+    <script type="text/javascript" src="src/controller.js"></script>
+
+    <style>
+        body {
+            background-image: url('https://content.dragonlearn.in/fp/97/fat_player/student/grad-f07e854ce64f9aee2db7bd67146ff0e4800feeed40c8f7116fcb3b6a048deb64.jpg');
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-size: cover;
+        }
+        
+        #game_box {
+            height: 700px;
+            width: 1025px;
+            border-radius: 20px;
+            position: absolute;
+            left: 50%;
+            margin-left: -512px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+            display: block;
+            overflow: hidden;
+        }
+    </style>
 </head>
+
 <body>
-<script type="text/javascript" src="phaser.min.js"></script>
-<script type="text/javascript" src="src/congratulation.js"></script>
-<script type="text/javascript" src="src/start.js"></script>
-<script type="text/javascript" src="src/game1.js"></script>
-<script type="text/javascript" src="src/game2.js"></script>
-<script type="text/javascript" src="src/game3.js"></script>
-<script type="text/javascript" src="src/controller.js"></script>
+    <div id="game_box"></div>
 </body>
+
 </html>
