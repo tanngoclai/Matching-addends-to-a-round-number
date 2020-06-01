@@ -1,4 +1,10 @@
-var game = new Phaser.Game(1250, 700, Phaser.AUTO, "");
+var config = {
+    type: Phaser.AUTO,
+    width: 1025,
+    height: 700,
+    parent: "game_box"
+}
+var game = new Phaser.Game(config);
 
 game.state.add("Start", Start);
 

@@ -1,6 +1,6 @@
-var Game2 = {
-    preload: function () {
-        game.load.image("background", "assets/background.png");
+let Game2 = {
+    preload: function() {
+
         game.load.image("stage1", "assets/stage1.png");
         game.load.image("turnBall", "assets/turnBall.png");
         game.load.image("turnBar", "assets/turnBar.png");
@@ -12,13 +12,13 @@ var Game2 = {
         game.load.image("textBox3", "assets/textbox3.png");
     },
 
-    create: function (state) {
+    create: function(state) {
 
         game.physics.startSystem(Phaser.Physics.ARCADE);
-        state.add.image(0, 0, "background");
+
         state.stage1 = game.add.sprite(game.world.width / 2 - 475, 25, "stage1");
 
-        var style = {font: "32px Arial", fill: "#000"};
+        let style = { font: "32px Arial", fill: "#000" };
 
         Game2.addBackButton(state);
         state.ball = [];
@@ -57,7 +57,7 @@ var Game2 = {
         });
     },
 
-    update: function (state) {
+    update: function(state) {
         Game2.updateTextBag(state);
         Game2.updateFlag(state);
         Game2.updateTextBox(state);
@@ -99,11 +99,11 @@ var Game2 = {
         }
     },
 
-    back: function () {
+    back: function() {
         game.state.start("Start");
     },
 
-    addBackButton: function (state) {
+    addBackButton: function(state) {
         backButton = game.add.text(state.stage1.x + 5, state.stage1.y + 7, "<", {
             font: "40px Arial",
             fill: " #00BFFF",
@@ -120,7 +120,7 @@ var Game2 = {
         backButton2.events.onInputUp.add(Game3.back);
     },
 
-    addTurnBar: function (state) {
+    addTurnBar: function(state) {
 
         turnBar = game.add.image(game.world.width / 2, 50, "turnBar");
         turnBar.anchor.set(0.5);
@@ -139,7 +139,7 @@ var Game2 = {
         }
     },
 
-    addMarkBag: function (state) {
+    addMarkBag: function(state) {
         state.markBag = [];
         for (i = 0; i < 4; i++) {
             newMark = state.add.image(game.world.width / 2 + (i - 2) * 105, 165, "bag2");
@@ -147,7 +147,7 @@ var Game2 = {
         }
     },
 
-    addBag: function (state) {
+    addBag: function(state) {
         bounds = new Phaser.Rectangle(game.world.width / 2 - 473, 78, state.stage1.width, state.stage1.height - 100);
         state.bag = [];
         state.textBag = [];
@@ -159,7 +159,7 @@ var Game2 = {
             newBag.input.enableDrag();
             newBag.input.boundsRect = bounds;
 
-            newText = game.add.text(0, 0, state.value[i], {font: "32px Arial", fill: "#000"});
+            newText = game.add.text(0, 0, state.value[i], { font: "32px Arial", fill: "#000" });
             newText.anchor.set(0.5);
 
             state.bag.push(newBag);
@@ -167,24 +167,24 @@ var Game2 = {
         }
     },
 
-    updateTextBag: function (state) {
+    updateTextBag: function(state) {
         for (i = 0; i < 4; i++) {
             state.textBag[i].x = Math.floor(state.bag[i].x + state.bag[i].width / 2 + 1);
             state.textBag[i].y = Math.floor(state.bag[i].y + state.bag[i].height / 2 + 25);
         }
     },
 
-    updateTextBox: function (state) {
+    updateTextBox: function(state) {
         state.textBox.x = Math.floor(state.flag.x + 11);
         state.textBox.y = Math.floor(state.flag.y + 12);
     },
 
-    updateFlag: function (state) {
+    updateFlag: function(state) {
         state.flag.x = state.car.x + 130;
         state.flag.y = state.car.y - 120;
     },
 
-    updateBag: function (state) {
+    updateBag: function(state) {
         //Cap nhat gio trong theo theo vi tri cua xe
         state.bag[state.bagInCar[0]].x = state.car.x - 120;
         state.bag[state.bagInCar[0]].y = state.car.y - 64;
@@ -192,13 +192,13 @@ var Game2 = {
         state.bag[state.bagInCar[1]].y = state.bag[state.bagInCar[0]].y;
     },
 
-    updateRes1: function (state) {
+    updateRes1: function(state) {
         //Cap nhat vi tri ket qua 1 theo vi tri cua la co
         state.addRes[0].x = state.flag.x + 16;
         state.addRes[0].y = state.flag.y + 18;
     },
 
-    moveBag: function (i, state) {
+    moveBag: function(i, state) {
         x = state.markBag[i].x;
         y = state.markBag[i].y;
 
@@ -224,7 +224,7 @@ var Game2 = {
         }
     },
 
-    backIfFail: function () {
+    backIfFail: function() {
         //Neu co 2 gio tren xe
         if (this.bagInCar[0] > -1 && this.bagInCar[1] > -1) {
             //Neu ghep dung 2 gio thi checkMatch=true
@@ -241,26 +241,26 @@ var Game2 = {
         }
     },
 
-    isAroundPos1InCar: function (state, i) {
-        return state.bag[i].x > state.posBagInCar1[0] - 80
-            && state.bag[i].x < state.posBagInCar1[0] + 20
-            && state.bag[i].y > state.posBagInCar1[1] - 80
-            && state.bag[i].y < state.posBagInCar1[1] + 80;
+    isAroundPos1InCar: function(state, i) {
+        return state.bag[i].x > state.posBagInCar1[0] - 80 &&
+            state.bag[i].x < state.posBagInCar1[0] + 20 &&
+            state.bag[i].y > state.posBagInCar1[1] - 80 &&
+            state.bag[i].y < state.posBagInCar1[1] + 80;
     },
 
-    isAroundPos2InCar: function (state, i) {
-        return state.bag[i].x > state.posBagInCar2[0] - 60
-            && state.bag[i].x < state.posBagInCar2[0] + 40
-            && state.bag[i].y > state.posBagInCar2[1] - 80
-            && state.bag[i].y < state.posBagInCar2[1] + 80;
+    isAroundPos2InCar: function(state, i) {
+        return state.bag[i].x > state.posBagInCar2[0] - 60 &&
+            state.bag[i].x < state.posBagInCar2[0] + 40 &&
+            state.bag[i].y > state.posBagInCar2[1] - 80 &&
+            state.bag[i].y < state.posBagInCar2[1] + 80;
     },
 
-    showOperator1: function (state) {
+    showOperator1: function(state) {
         state.textBox.visible = true;
         game.input.keyboard.addCallbacks(state, null, null, Game2.inputRes1);
     },
 
-    showOperator2: function (state) {
+    showOperator2: function(state) {
         count = 1;
         for (i = 0; i < 4; i++) {
             if (i !== state.bagInCar[0] && i !== state.bagInCar[1]) {
@@ -269,22 +269,22 @@ var Game2 = {
             }
         }
         state.textBox2.visible = true;
-        game.add.text(state.stage1.x + 450, state.stage1.y + 450, '+', {font: "32px Arial", fill: "#000"});
-        game.add.text(state.stage1.x + 600, state.stage1.y + 450, '+', {font: "32px Arial", fill: "#000"});
-        game.add.text(state.stage1.x + 750, state.stage1.y + 450, '=', {font: "32px Arial", fill: "#000"});
+        game.add.text(state.stage1.x + 450, state.stage1.y + 450, '+', { font: "32px Arial", fill: "#000" });
+        game.add.text(state.stage1.x + 600, state.stage1.y + 450, '+', { font: "32px Arial", fill: "#000" });
+        game.add.text(state.stage1.x + 750, state.stage1.y + 450, '=', { font: "32px Arial", fill: "#000" });
         game.input.keyboard.addCallbacks(state, null, null, Game2.inputRes2);
     },
 
-    inputRes1: function (char) {
+    inputRes1: function(char) {
         Game2.inputRes(char, this, 0);
     },
 
-    inputRes2: function (char) {
+    inputRes2: function(char) {
         Game2.inputRes(char, this, 1);
     },
 
-    inputRes: function (char, state, i) {
-        var trueRes;
+    inputRes: function(char, state, i) {
+        let trueRes;
         if (i === 0) {
             trueRes = state.value[state.bagInCar[0]] + state.value[state.bagInCar[1]];
         } else {
@@ -300,167 +300,167 @@ var Game2 = {
         } else if (state.res[i] === trueRes.toString()) state.checkRes[i] = true;
     },
 
-    nextTurn: function (state) {
+    nextTurn: function(state) {
         game.physics.arcade.moveToXY(state.ball[state.turn - 1], turnBar.x + turnBar.width / 2 - 15 - 23 * (4 - state.turn), turnBar.y, 100, 200);
     }
 };
 
 
-Game2.StateA = function () {
+Game2.StateA = function() {
     this.stage1;
-    this.ball;//Bong dem luot choi
+    this.ball; //Bong dem luot choi
     this.turn = 4;
-    this.markBag;//2 cho dat 2 gio tren xe
+    this.markBag; //2 cho dat 2 gio tren xe
     this.car;
-    this.bag;//4 gio
+    this.bag; //4 gio
     this.flag;
-    this.textBag;//So o trong gio
-    this.checkMatch;//Kiem tra ghep 2 gio dung hay sai
+    this.textBag; //So o trong gio
+    this.checkMatch; //Kiem tra ghep 2 gio dung hay sai
     this.value = [18, 29, 3, 31];
-    this.textBox;//Cho de dien ket qua
+    this.textBox; //Cho de dien ket qua
     this.textBox2;
-    this.posBagInCar1;//Vi tri dat 2 gio tren xe
+    this.posBagInCar1; //Vi tri dat 2 gio tren xe
     this.posBagInCar2;
-    this.bagInCar;//So thu tu cua gio dang o tren xe
-    this.res;//Bien luu ket qua
-    this.checkRes;//Kiem tra ket qua dung hay sai
-    this.addRes;//Hien thi ket qua len man hinh
+    this.bagInCar; //So thu tu cua gio dang o tren xe
+    this.res; //Bien luu ket qua
+    this.checkRes; //Kiem tra ket qua dung hay sai
+    this.addRes; //Hien thi ket qua len man hinh
 };
 
 Game2.StateA.prototype = {
-    preload: function () {
+    preload: function() {
         Game2.preload();
     },
 
-    create: function () {
+    create: function() {
         Game2.create(this);
     },
 
-    update: function () {
+    update: function() {
         Game2.update(this);
     },
 
-    nextState: function () {
+    nextState: function() {
         game.state.start('Game2_StateB');
     }
 };
 
 
-Game2.StateB = function () {
+Game2.StateB = function() {
     this.stage1;
-    this.ball;//Bong dem luot choi
+    this.ball; //Bong dem luot choi
     this.turn = 3;
-    this.markBag;//2 cho dat 2 gio tren xe
+    this.markBag; //2 cho dat 2 gio tren xe
     this.car;
-    this.bag;//4 gio
+    this.bag; //4 gio
     this.flag;
-    this.textBag;//So o trong gio
-    this.checkMatch;//Kiem tra ghep 2 gio dung hay sai
+    this.textBag; //So o trong gio
+    this.checkMatch; //Kiem tra ghep 2 gio dung hay sai
     this.value = [32, 14, 26, 15];
-    this.textBox;//Cho de dien ket qua
+    this.textBox; //Cho de dien ket qua
     this.textBox2;
-    this.posBagInCar1;//Vi tri dat 2 gio tren xe
+    this.posBagInCar1; //Vi tri dat 2 gio tren xe
     this.posBagInCar2;
-    this.bagInCar;//So thu tu cua gio dang o tren xe
-    this.res;//Bien luu ket qua
-    this.checkRes;//Kiem tra ket qua dung hay sai
-    this.addRes;//Hien thi ket qua len man hinh
+    this.bagInCar; //So thu tu cua gio dang o tren xe
+    this.res; //Bien luu ket qua
+    this.checkRes; //Kiem tra ket qua dung hay sai
+    this.addRes; //Hien thi ket qua len man hinh
 };
 
 Game2.StateB.prototype = {
-    preload: function () {
+    preload: function() {
         Game2.preload();
     },
 
-    create: function () {
+    create: function() {
         Game2.create(this);
     },
 
-    update: function () {
+    update: function() {
         Game2.update(this);
     },
 
-    nextState: function () {
+    nextState: function() {
         game.state.start('Game2_StateC');
     }
 };
 
 
-Game2.StateC = function () {
+Game2.StateC = function() {
     this.stage1;
-    this.ball;//Bong dem luot choi
+    this.ball; //Bong dem luot choi
     this.turn = 2;
-    this.markBag;//2 cho dat 2 gio tren xe
+    this.markBag; //2 cho dat 2 gio tren xe
     this.car;
-    this.bag;//4 gio
+    this.bag; //4 gio
     this.flag;
-    this.textBag;//So o trong gio
-    this.checkMatch;//Kiem tra ghep 2 gio dung hay sai
+    this.textBag; //So o trong gio
+    this.checkMatch; //Kiem tra ghep 2 gio dung hay sai
     this.value = [17, 34, 4, 23];
-    this.textBox;//Cho de dien ket qua
+    this.textBox; //Cho de dien ket qua
     this.textBox2;
-    this.posBagInCar1;//Vi tri dat 2 gio tren xe
+    this.posBagInCar1; //Vi tri dat 2 gio tren xe
     this.posBagInCar2;
-    this.bagInCar;//So thu tu cua gio dang o tren xe
-    this.res;//Bien luu ket qua
-    this.checkRes;//Kiem tra ket qua dung hay sai
-    this.addRes;//Hien thi ket qua len man hinh
+    this.bagInCar; //So thu tu cua gio dang o tren xe
+    this.res; //Bien luu ket qua
+    this.checkRes; //Kiem tra ket qua dung hay sai
+    this.addRes; //Hien thi ket qua len man hinh
 };
 
 Game2.StateC.prototype = {
-    preload: function () {
+    preload: function() {
         Game2.preload();
     },
 
-    create: function () {
+    create: function() {
         Game2.create(this);
     },
 
-    update: function () {
+    update: function() {
         Game2.update(this);
     },
 
-    nextState: function () {
+    nextState: function() {
         game.state.start('Game2_StateD');
     }
 };
 
 
-Game2.StateD = function () {
+Game2.StateD = function() {
     this.stage1;
-    this.ball;//Bong dem luot choi
+    this.ball; //Bong dem luot choi
     this.turn = 1;
-    this.markBag;//2 cho dat 2 gio tren xe
+    this.markBag; //2 cho dat 2 gio tren xe
     this.car;
-    this.bag;//4 gio
+    this.bag; //4 gio
     this.flag;
-    this.textBag;//So o trong gio
-    this.checkMatch;//Kiem tra ghep 2 gio dung hay sai
+    this.textBag; //So o trong gio
+    this.checkMatch; //Kiem tra ghep 2 gio dung hay sai
     this.value = [3, 8, 6, 4];
-    this.textBox;//Cho de dien ket qua
+    this.textBox; //Cho de dien ket qua
     this.textBox2;
-    this.posBagInCar1;//Vi tri dat 2 gio tren xe
+    this.posBagInCar1; //Vi tri dat 2 gio tren xe
     this.posBagInCar2;
-    this.bagInCar;//So thu tu cua gio dang o tren xe
-    this.res;//Bien luu ket qua
-    this.checkRes;//Kiem tra ket qua dung hay sai
-    this.addRes;//Hien thi ket qua len man hinh
+    this.bagInCar; //So thu tu cua gio dang o tren xe
+    this.res; //Bien luu ket qua
+    this.checkRes; //Kiem tra ket qua dung hay sai
+    this.addRes; //Hien thi ket qua len man hinh
 };
 
 Game2.StateD.prototype = {
-    preload: function () {
+    preload: function() {
         Game2.preload();
     },
 
-    create: function () {
+    create: function() {
         Game2.create(this);
     },
 
-    update: function () {
+    update: function() {
         Game2.update(this);
     },
 
-    nextState: function () {
+    nextState: function() {
         game.state.start('Congratulation');
     }
 };
