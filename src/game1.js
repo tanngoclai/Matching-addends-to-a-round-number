@@ -196,6 +196,21 @@ var Game1 = {
         }
     },
 
+    isTailAroundHead:function(state,i){
+        if (state.tail[i].y < state.head[1].y - state.head[0].height / 2) {
+            //Neu o gan Head 0 thi ghep vao Head 0
+            Game1.matchTailToHead(i, 0, state);
+        } else {
+            if (state.tail[i].y < state.head[2].y - state.head[1].height / 2) {
+                //Neu o gan Head 1 thi ghep vao Head 1
+                Game1.matchTailToHead(i, 1, state);
+            } else {
+                //Neu o gan Head 2 thi ghep vao Head 2
+                Game1.matchTailToHead(i, 2, state);
+            }
+        }
+    },
+
     moveTail: function (i, x, y, state) {
         if (game.input.mousePointer.isDown) {
             //Neu nhan chuot thi Tail khong di chuyen
@@ -207,18 +222,8 @@ var Game1 = {
                     // Quay ve vi tri ban dau neu khong o gan Head nao
                     game.physics.arcade.moveToXY(state.tail[i], x, y, 100, 100);
                 } else {
-                    if (state.tail[i].y < state.head[1].y - state.head[0].height / 2) {
-                        //Neu o gan Head 0 thi ghep vao Head 0
-                        Game1.matchTailToHead(i, 0, state);
-                    } else {
-                        if (state.tail[i].y < state.head[2].y - state.head[1].height / 2) {
-                            //Neu o gan Head 1 thi ghep vao Head 1
-                            Game1.matchTailToHead(i, 1, state);
-                        } else {
-                            //Neu o gan Head 2 thi ghep vao Head 2
-                            Game1.matchTailToHead(i, 2, state);
-                        }
-                    }
+                    //Neu o gan Head nao thi noi vao Head do
+                    Game1.isTailAroundHead(state,i);
                 }
             }
         }
@@ -256,14 +261,16 @@ var Game1 = {
     inputTrueKey: function (i, char, state) {
         //Ham kiem tra ket qua
         if (state.res[i].length < 2) state.res[i] = state.res[i] + char;
-        if (state.res[i].length === 1) a1 = game.add.text(state.flag[i].x + 20, state.flag[i].y + 22, state.res[i]);
-        else if (state.res[i].length === 2) a2 = game.add.text(a1.x + 20, a1.y, state.res[i].charAt(1));
+        if (state.res[i].length === 1) showRes = game.add.text(state.flag[i].x + 20, state.flag[i].y + 22, state.res[i]); 
         trueRes = state.valueHead[i] + state.valueTail[state.matchHead[i]];
         if (state.res[i].length === 2 && state.res[i] !== trueRes.toString()) {
-            a1.destroy();
-            a2.destroy();
+            showRes.destroy();
             state.res[i] = '';
-        } else if (state.res[i] === trueRes.toString()) state.checkRes[i] = true;
+        } else if (state.res[i] === trueRes.toString()) {
+            showRes.destroy();
+            showRes = game.add.text(state.flag[i].x + 20, state.flag[i].y + 22, state.res[i]);
+            state.checkRes[i] = true;
+        }
     },
 
     nextTurn: function (state) {
