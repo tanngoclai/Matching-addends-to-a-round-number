@@ -16,6 +16,8 @@ var Game3 = {
         state.add.image(0, 0, "background");
         state.stage1 = game.add.sprite(game.world.width / 2 - 475, 25, "stage1");
 
+        state.failActivities = false;
+
         state.ball = [];
         state.blank = [];
         state.textDefault = [];
@@ -96,10 +98,19 @@ var Game3 = {
             game.input.keyboard.addCallbacks(state, null, null, Game3.inputRes);
         }
 
+        if(state.failActivities){
+            Game3.backTurn(state);
+        }
+
         //Khi hoan thanh luot choi
-        if (state.endGame) {
-            game.time.events.add(1000, state.nextState, state);
-            Game3.nextTurn(state);
+        if (state.endGame){
+            if (!state.failActivities){
+                game.time.events.add(1000, state.nextState, state);
+                Game3.nextTurn(state);
+            }
+            else {
+                game.time.events.add(1000, state.backState, state);
+            }
         }
     },
 
@@ -259,6 +270,7 @@ var Game3 = {
     backIfFail: function () {
         for (i = 1; i < 3; i++) {
             if (i !== this.pairWithValue0) {
+                this.failActivities = true;
                 game.physics.arcade.moveToXY(this.box[i], this.stage1.x + 10 + i * (10 + this.box[i - 1].width), this.stage1.y + 75, 100, 100);
             }
         }
@@ -315,10 +327,15 @@ var Game3 = {
             font: "48px Arial",
             fill: "#000"
         };
+
         if (state.result.length < 2) state.result = state.result + char;
+
         if (state.result.length === 1) showRes = game.add.text(state.textDefault[3].x + 288, state.textDefault[3].y + 3, state.result, style);
+
         trueRes = state.value[0] + state.value[1] + state.value[2];
+
         if (state.result.length === 2 && state.result !== trueRes.toString()) {
+            state.failActivities = true;
             showRes.destroy();
             state.result = '';
         } else if (state.result === trueRes.toString()) {
@@ -330,13 +347,17 @@ var Game3 = {
 
     nextTurn: function (state) {
         game.physics.arcade.moveToXY(state.ball[state.turn - 1], turnBar.x + turnBar.width / 2 - 15 - 23 * (6 - state.turn), turnBar.y, 100, 200);
+    },
+
+    backTurn: function (state) {
+        if(state.turn < 6) game.physics.arcade.moveToXY(state.ball[state.turn], turnBar.x - turnBar.width / 2 + 15 + state.turn * 23, turnBar.y, 100, 200);
     }
 };
 
 
 Game3.StateA = function () {
+    this.failActivities;//Kiem tra xem da thao tac sai lan nao hay chua, neu da tung thao tac sai thi lui luot choi
     this.stage1;
-    this.ball;//Bong dem luot choi
     this.turn = 6;
     this.box;//Hop chua gia tri la so, co the di chuyen duoc
     this.blank;//Vi tri de dat cac hop chua gia tri la so (this.box)
@@ -371,6 +392,10 @@ Game3.StateA.prototype = {
 
     nextState: function () {
         game.state.start('Game3_StateB');
+    },
+
+    backState: function () {
+        game.state.start('Game3_StateA');
     }
 
 };
@@ -378,6 +403,7 @@ Game3.StateA.prototype = {
 
 Game3.StateB = function () {
     //Xem chu thich cac bien o StateA
+    this.failActivities;
     this.stage1;
     this.ball;
     this.turn = 5;
@@ -414,6 +440,10 @@ Game3.StateB.prototype = {
 
     nextState: function () {
         game.state.start('Game3_StateC');
+    },
+
+    backState: function () {
+        game.state.start('Game3_StateA');
     }
 
 };
@@ -421,6 +451,7 @@ Game3.StateB.prototype = {
 
 Game3.StateC = function () {
     //Xem chu thich cac bien o StateA
+    this.failActivities;
     this.stage1;
     this.ball;
     this.turn = 4;
@@ -457,6 +488,10 @@ Game3.StateC.prototype = {
 
     nextState: function () {
         game.state.start('Game3_StateD');
+    },
+
+    backState: function () {
+        game.state.start('Game3_StateB');
     }
 
 };
@@ -464,6 +499,7 @@ Game3.StateC.prototype = {
 
 Game3.StateD = function () {
     //Xem chu thich cac bien o StateA
+    this.failActivities;
     this.stage1;
     this.ball;
     this.turn = 3;
@@ -500,12 +536,17 @@ Game3.StateD.prototype = {
 
     nextState: function () {
         game.state.start('Game3_StateE');
+    },
+
+    backState: function () {
+        game.state.start('Game3_StateC');
     }
 };
 
 
 Game3.StateE = function () {
     //Xem chu thich cac bien o StateA
+    this.failActivities;
     this.stage1;
     this.ball;
     this.turn = 2;
@@ -542,12 +583,17 @@ Game3.StateE.prototype = {
 
     nextState: function () {
         game.state.start('Game3_StateF');
+    },
+
+    backState: function () {
+        game.state.start('Game3_StateD');
     }
 };
 
 
 Game3.StateF = function () {
     //Xem chu thich cac bien o StateA
+    this.failActivities;
     this.stage1;
     this.ball;
     this.turn = 1;
@@ -584,5 +630,9 @@ Game3.StateF.prototype = {
 
     nextState: function () {
         game.state.start('Congratulation');
+    },
+
+    backState: function () {
+        game.state.start('Game3_StateE');
     }
 };

@@ -20,6 +20,8 @@ var Game2 = {
 
         var style = {font: "32px Arial", fill: "#000"};
 
+        state.failActivities = false;
+
         Game2.addBackButton(state);
         state.ball = [];
         Game2.addTurnBar(state);
@@ -92,10 +94,19 @@ var Game2 = {
             }
         }
 
+        if(state.failActivities) {
+            Game2.backTurn(state);
+        }
+
         //Neu dien dung ket qua thu 2 thi chuyen luot tiep theo
-        if (state.checkRes[1]) {
-            game.time.events.add(1000, state.nextState, state);
-            Game2.nextTurn(state);
+        if (state.checkRes[1]){
+            if(!state.failActivities) {
+                game.time.events.add(1000, state.nextState, state);
+                Game2.nextTurn(state);
+            }
+            else {
+                game.time.events.add(1000, state.backState, state);
+            }
         }
     },
 
@@ -233,6 +244,7 @@ var Game2 = {
             }
             //Neu ghep sai thi quay ve vi tri ban dau
             else {
+                this.failActivities = true;
                 game.physics.arcade.moveToXY(this.bag[this.bagInCar[0]], this.markBag[this.bagInCar[0]].x, this.markBag[this.bagInCar[0]].y, 100, 70);
                 game.physics.arcade.moveToXY(this.bag[this.bagInCar[1]], this.markBag[this.bagInCar[1]].x, this.markBag[this.bagInCar[1]].y, 100, 70);
                 this.bagInCar[0] = -1;
@@ -292,9 +304,12 @@ var Game2 = {
         }
 
         if (state.res[i].length < 2) state.res[i] = state.res[i] + char;
+
         if (state.res[i].length === 1) state.addRes[i].setText(state.res[i]);
         else if (state.res[i].length === 2) state.addRes[i].setText(state.res[i]);
+
         if (state.res[i].length === 2 && state.res[i] !== trueRes.toString()) {
+            state.failActivities = true;
             state.res[i] = '';
             state.addRes[i].setText(state.res[i]);
         } else if (state.res[i] === trueRes.toString()) state.checkRes[i] = true;
@@ -302,11 +317,17 @@ var Game2 = {
 
     nextTurn: function (state) {
         game.physics.arcade.moveToXY(state.ball[state.turn - 1], turnBar.x + turnBar.width / 2 - 15 - 23 * (4 - state.turn), turnBar.y, 100, 200);
+    },
+
+    backTurn: function (state) {
+        if(state.turn < 4) game.physics.arcade.moveToXY(state.ball[state.turn], turnBar.x - turnBar.width / 2 + 15 + state.turn * 23, turnBar.y, 100, 200);
     }
+
 };
 
 
 Game2.StateA = function () {
+    this.failActivities;//Kiem tra xem da thao tac sai lan nao hay chua, neu da tung thao tac sai thi lui luot choi
     this.stage1;
     this.ball;//Bong dem luot choi
     this.turn = 4;
@@ -342,11 +363,16 @@ Game2.StateA.prototype = {
 
     nextState: function () {
         game.state.start('Game2_StateB');
+    },
+
+    backState: function () {
+        game.state.start('Game2_StateA');
     }
 };
 
 
 Game2.StateB = function () {
+    this.failActivities;
     this.stage1;
     this.ball;//Bong dem luot choi
     this.turn = 3;
@@ -382,11 +408,16 @@ Game2.StateB.prototype = {
 
     nextState: function () {
         game.state.start('Game2_StateC');
+    },
+
+    backState: function () {
+        game.state.start('Game2_StateA');
     }
 };
 
 
 Game2.StateC = function () {
+    this.failActivities;
     this.stage1;
     this.ball;//Bong dem luot choi
     this.turn = 2;
@@ -422,11 +453,16 @@ Game2.StateC.prototype = {
 
     nextState: function () {
         game.state.start('Game2_StateD');
+    },
+
+    backState: function () {
+        game.state.start('Game2_StateB');
     }
 };
 
 
 Game2.StateD = function () {
+    this.failActivities;
     this.stage1;
     this.ball;//Bong dem luot choi
     this.turn = 1;
@@ -462,5 +498,9 @@ Game2.StateD.prototype = {
 
     nextState: function () {
         game.state.start('Congratulation');
+    },
+
+    backState: function () {
+        game.state.start('Game2_StateC');
     }
 };

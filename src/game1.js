@@ -15,6 +15,8 @@ var Game1 = {
         state.add.image(0, 0, "background");
         state.stage1 = game.add.sprite(game.world.width / 2 - 475, 25, "stage1");
 
+        state.failActivities = false;
+
         state.ball = [];
         state.tail = [];
         state.head = [];
@@ -53,10 +55,19 @@ var Game1 = {
             }
         }
 
+        if(state.failActivities){
+            Game1.backTurn(state);
+        }
+
         //Neu 3 ket qua dung thi chuyen luot tiep theo
         if (state.checkRes[0] && state.checkRes[1] && state.checkRes[2]) {
-            game.time.events.add(1000, state.nextState, state);
-            Game1.nextTurn(state);
+            if(!state.failActivities){
+                game.time.events.add(1000, state.nextState, state);
+                Game1.nextTurn(state);
+            }
+            else {
+                game.time.events.add(1000, state.backState, state);
+            }
         }
     },
 
@@ -192,22 +203,8 @@ var Game1 = {
             state.checkMatch[j] = true;
         } else {
             //Neu ghep sai, quay ve vi tri ban dau
+            state.failActivities = true;
             game.time.events.add(1500, Game1.backIfFail, state);
-        }
-    },
-
-    isTailAroundHead:function(state,i){
-        if (state.tail[i].y < state.head[1].y - state.head[0].height / 2) {
-            //Neu o gan Head 0 thi ghep vao Head 0
-            Game1.matchTailToHead(i, 0, state);
-        } else {
-            if (state.tail[i].y < state.head[2].y - state.head[1].height / 2) {
-                //Neu o gan Head 1 thi ghep vao Head 1
-                Game1.matchTailToHead(i, 1, state);
-            } else {
-                //Neu o gan Head 2 thi ghep vao Head 2
-                Game1.matchTailToHead(i, 2, state);
-            }
         }
     },
 
@@ -222,8 +219,18 @@ var Game1 = {
                     // Quay ve vi tri ban dau neu khong o gan Head nao
                     game.physics.arcade.moveToXY(state.tail[i], x, y, 100, 100);
                 } else {
-                    //Neu o gan Head nao thi noi vao Head do
-                    Game1.isTailAroundHead(state,i);
+                    if (state.tail[i].y < state.head[1].y - state.head[0].height / 2) {
+                        //Neu o gan Head 0 thi ghep vao Head 0
+                        Game1.matchTailToHead(i, 0, state);
+                    } else {
+                        if (state.tail[i].y < state.head[2].y - state.head[1].height / 2) {
+                            //Neu o gan Head 1 thi ghep vao Head 1
+                            Game1.matchTailToHead(i, 1, state);
+                        } else {
+                            //Neu o gan Head 2 thi ghep vao Head 2
+                            Game1.matchTailToHead(i, 2, state);
+                        }
+                    }
                 }
             }
         }
@@ -261,9 +268,13 @@ var Game1 = {
     inputTrueKey: function (i, char, state) {
         //Ham kiem tra ket qua
         if (state.res[i].length < 2) state.res[i] = state.res[i] + char;
-        if (state.res[i].length === 1) showRes = game.add.text(state.flag[i].x + 20, state.flag[i].y + 22, state.res[i]); 
+
+        if (state.res[i].length === 1) showRes = game.add.text(state.flag[i].x + 20, state.flag[i].y + 22, state.res[i]);
+
         trueRes = state.valueHead[i] + state.valueTail[state.matchHead[i]];
+
         if (state.res[i].length === 2 && state.res[i] !== trueRes.toString()) {
+            state.failActivities = true;
             showRes.destroy();
             state.res[i] = '';
         } else if (state.res[i] === trueRes.toString()) {
@@ -275,11 +286,16 @@ var Game1 = {
 
     nextTurn: function (state) {
         game.physics.arcade.moveToXY(state.ball[state.turn - 1], turnBar.x + turnBar.width / 2 - 15 - 23 * (3 - state.turn), turnBar.y, 100, 200);
+    },
+
+    backTurn: function (state) {
+        if(state.turn < 3) game.physics.arcade.moveToXY(state.ball[state.turn], turnBar.x - turnBar.width / 2 + 15 + state.turn * 23, turnBar.y, 100, 200);
     }
 };
 
 
 Game1.StateA = function () {
+    this.failActivities;//Kiem tra xem da thao tac sai lan nao hay chua, neu da tung thao tac sai thi lui luot choi
     this.stage1;
     this.ball;//Bong dem luot choi
     this.turn = 3;
@@ -312,12 +328,17 @@ Game1.StateA.prototype = {
 
     nextState: function () {
         game.state.start('Game1_StateB');
+    },
+
+    backState: function () {
+        game.state.start('Game1_StateA');
     }
 };
 
 
 Game1.StateB = function () {
     //Xem chu thich cac bien o StateA
+    this.failActivities;
     this.stage1;
     this.ball;
     this.turn = 2;
@@ -350,12 +371,17 @@ Game1.StateB.prototype = {
 
     nextState: function () {
         game.state.start('Game1_StateC');
+    },
+
+    backState: function () {
+        game.state.start('Game1_StateA');
     }
 };
 
 
 Game1.StateC = function () {
     //Xem chu thich cac bien o StateA
+    this.failActivities;
     this.stage1;
     this.ball;
     this.turn = 1;
@@ -388,5 +414,9 @@ Game1.StateC.prototype = {
 
     nextState: function () {
         game.state.start("Congratulation");
+    },
+
+    backState: function () {
+        game.state.start('Game1_StateB');
     }
 };

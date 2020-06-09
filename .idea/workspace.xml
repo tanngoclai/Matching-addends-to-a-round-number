@@ -3,11 +3,9 @@
   <component name="ChangeListManager">
     <list default="true" id="c250b96d-e35f-47b7-b1ac-fd1ef7ee8243" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/controller.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/controller.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/game1.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/game1.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/game2.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/game2.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/game3.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/game3.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/start.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/start.js" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -25,6 +23,7 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="UPDATE_TYPE" value="MERGE" />
   </component>
   <component name="ProjectId" id="1a7PPI6ZKaMcCQUaU7jSX24i9TC" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
@@ -35,7 +34,7 @@
     <property name="DefaultHtmlFileTemplate" value="HTML File" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="last_opened_file_path" value="D:/test/Matching-addends-to-a-round-number-master" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="settings.editor.selected.configurable" value="project.propVCSSupport.Mappings" />
   </component>
@@ -104,7 +103,11 @@
       <workItem from="1589300628315" duration="3408000" />
       <workItem from="1589305194204" duration="1715000" />
       <workItem from="1589335999721" duration="19623000" />
-      <workItem from="1589383167183" duration="282000" />
+      <workItem from="1589383167183" duration="295000" />
+      <workItem from="1589855980233" duration="1452000" />
+      <workItem from="1591064940584" duration="780000" />
+      <workItem from="1591459762286" duration="5690000" />
+      <workItem from="1591676436319" duration="4053000" />
     </task>
     <servers />
   </component>
@@ -129,5 +132,17 @@
     <ignored-roots>
       <path value="$PROJECT_DIR$/RoundNumber_INT2208_Team27" />
     </ignored-roots>
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/src/game3.js</url>
+          <line>116</line>
+          <properties lambdaOrdinal="-1" />
+          <option name="timeStamp" value="5" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>
