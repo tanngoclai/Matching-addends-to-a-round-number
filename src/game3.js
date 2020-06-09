@@ -311,21 +311,21 @@ var Game3 = {
     },
 
     inputTrueRes: function (char, state) {
+        style = {
+            font: "48px Arial",
+            fill: "#000"
+        };
         if (state.result.length < 2) state.result = state.result + char;
-        if (state.result.length === 1) a1 = game.add.text(state.textDefault[3].x + 288, state.textDefault[3].y + 3, state.result, {
-            font: "48px Arial",
-            fill: "#000"
-        });
-        else if (state.result.length === 2) a2 = game.add.text(a1.x + 30, a1.y, state.result.charAt(1), {
-            font: "48px Arial",
-            fill: "#000"
-        });
+        if (state.result.length === 1) showRes = game.add.text(state.textDefault[3].x + 288, state.textDefault[3].y + 3, state.result, style);
         trueRes = state.value[0] + state.value[1] + state.value[2];
         if (state.result.length === 2 && state.result !== trueRes.toString()) {
-            a1.destroy();
-            a2.destroy();
+            showRes.destroy();
             state.result = '';
-        } else if (state.result === trueRes.toString()) state.endGame = true;
+        } else if (state.result === trueRes.toString()) {
+            showRes.destroy();
+            showRes = game.add.text(state.textDefault[3].x + 288, state.textDefault[3].y + 3, state.result, style);
+            state.endGame = true;
+        }
     },
 
     nextTurn: function (state) {
