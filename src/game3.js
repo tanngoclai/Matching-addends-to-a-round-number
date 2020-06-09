@@ -7,7 +7,7 @@ var Game3 = {
         game.load.image("box", "assets/box.png");
         game.load.image("bracket", "assets/bracket.png");
         game.load.image("ballRes", "assets/ballRes.png");
-        game.load.image("textBox", "assets/textBox3.png");
+        game.load.image("textBox", "assets/textbox3.png");
     },
 
     create: function (state) {
